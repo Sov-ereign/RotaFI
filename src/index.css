@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #f6f7f9;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-ink-50 text-ink-900 font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  ::selection {
+    @apply bg-brand-200 text-ink-900;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+    text-wrap: balance;
+  }
+  /* Thin, refined scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(98, 110, 138, 0.3) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(98, 110, 138, 0.3);
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(98, 110, 138, 0.5);
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white shadow-soft hover:bg-brand-700 hover:shadow-card active:scale-[0.98] focus-visible:ring-brand-500;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink-800 ring-1 ring-inset ring-ink-200 hover:bg-ink-50 hover:ring-ink-300 active:scale-[0.98] focus-visible:ring-ink-400;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-600 hover:bg-ink-100 hover:text-ink-900 focus-visible:ring-ink-400;
+  }
+  .btn-danger {
+    @apply btn bg-danger-600 text-white shadow-soft hover:bg-danger-700 active:scale-[0.98] focus-visible:ring-danger-500;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs rounded-lg gap-1.5;
+  }
+  .btn-lg {
+    @apply px-6 py-3 text-base rounded-xl2;
+  }
+  .card {
+    @apply rounded-xl2 bg-white ring-1 ring-ink-200/70 shadow-soft;
+  }
+  .card-hover {
+    @apply card transition-all duration-300 hover:shadow-lift hover:ring-ink-300/80 hover:-translate-y-0.5;
+  }
+  .input {
+    @apply w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-sm text-ink-900 ring-1 ring-inset ring-ink-200 placeholder:text-ink-400 transition focus:outline-none focus:ring-2 focus:ring-brand-500;
+  }
+  .label {
+    @apply block text-sm font-medium text-ink-700 mb-1.5;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .skeleton {
+    @apply rounded-md bg-gradient-to-r from-ink-100 via-ink-200/70 to-ink-100 bg-[length:200%_100%] animate-shimmer;
+  }
+  .hairline {
+    @apply border-t border-ink-200/70;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+  .grid-noise {
+    background-image:
+      linear-gradient(to right, rgba(15,23,42,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15,23,42,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .gradient-brand {
+    background-image: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+  .gradient-sapphire {
+    background-image: linear-gradient(135deg, #3375ff 0%, #1c54f5 100%);
+  }
+  .gradient-hero {
+    background-image:
+      radial-gradient(1200px 600px at 80% -10%, rgba(16,185,129,0.10), transparent 60%),
+      radial-gradient(900px 500px at 0% 20%, rgba(51,117,255,0.08), transparent 55%);
+  }
+}
