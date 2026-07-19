@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   ArrowLeft, Users, Coins, CalendarClock, TrendingUp, Loader2, Check,
   ShieldAlert, Sparkles, Play, HandCoins, History, Crown, Wallet, ScrollText,
-  Lock, UserPlus, Hourglass, PartyPopper, Gift, Share2,
+  Lock, UserPlus, Hourglass, PartyPopper, Gift, Share2, Gavel, Award,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { CommitteeDetail, MemberWithStatus, ActivityLog, Payout } from '../lib/types';
 import {
   fetchCommitteeDetail, contribute, advanceCycle, handleDefault, excuseMember,
-  joinCommittee, startCommittee, formatINR, formatINRShort,
+  joinCommittee, startCommittee, formatINR, formatINRShort, submitBid,
 } from '../lib/contract';
 import { shortAddress, avatarGradient, initials } from '../lib/wallet';
 import { ProgressRing } from '../components/ProgressRing';
@@ -43,6 +43,29 @@ export function CommitteeDetailPage({ committeeId }: { committeeId: string }) {
       toast({ kind: 'error', title: 'Action failed', description: e instanceof Error ? e.message : 'Unknown error' });
     } finally {
       setBusy(false);
+    }
+  };
+
+  const [bidDiscount, setBidDiscount] = useState('');
+  const [biddingBusy, setBiddingBusy] = useState(false);
+
+  const handlePlaceBid = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const discount = Number(bidDiscount);
+    if (isNaN(discount) || discount < 0) {
+      toast({ kind: 'error', title: 'Invalid bid', description: 'Please enter a valid positive discount amount.' });
+      return;
+    }
+    setBiddingBusy(true);
+    try {
+      await submitBid(committeeId, discount);
+      toast({ kind: 'success', title: 'Bid Submitted!', description: `Discount bid of ${discount} XLM recorded.` });
+      setBidDiscount('');
+      reload();
+    } catch (err) {
+      toast({ kind: 'error', title: 'Bidding failed', description: err instanceof Error ? err.message : 'Could not submit bid.' });
+    } finally {
+      setBiddingBusy(false);
     }
   };
 
@@ -205,7 +228,88 @@ export function CommitteeDetailPage({ committeeId }: { committeeId: string }) {
 
       {/* Main grid: members + (schedule | activity) */}
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 col-span-1 space-y-6">
+          {/* Bidding Panel */}
+          {status === 'active' && detail.payout_rule === 'bidding' && (
+            <div className="card overflow-hidden">
+              <div className="flex items-center justify-between border-b border-ink-100 px-5 py-3.5 bg-gradient-to-r from-brand-600 to-sapphire-600 text-white">
+                <h3 className="font-display text-base font-bold flex items-center gap-2"><Gavel className="h-5 w-5" /> Cycle Bidding Auction</h3>
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">Cycle {current_cycle + 1}</span>
+              </div>
+              <div className="p-5 space-y-4">
+                <div className="text-xs text-ink-500 leading-relaxed">
+                  Submit a discount bid to receive this cycle's pot. The member offering the highest discount wins. The discount amount is redistributed back to all other members as a savings dividend!
+                </div>
+
+                {/* Leaderboard / Active Bids */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-ink-400 uppercase tracking-wider flex items-center gap-1.5"><Award className="h-4 w-4 text-brand-500" /> Current Bids Leaderboard</h4>
+                  {(!detail.bids || detail.bids.length === 0) ? (
+                    <p className="text-xs text-ink-400 italic py-3 text-center bg-ink-50 rounded-xl">No bids submitted yet for this cycle.</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {detail.bids.map((b, idx) => {
+                        const bidder = detail.members.find(m => m.id === b.member_id);
+                        const isWinner = idx === 0;
+                        const netPayout = (contribution_amount * member_count) - b.discount_amount;
+                        return (
+                          <div key={b.id} className={`flex items-center justify-between px-3 py-2.5 rounded-xl border ${isWinner ? 'border-brand-200 bg-brand-50/40 ring-1 ring-brand-100' : 'border-ink-150 bg-white'}`}>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full text-[10px] font-bold ${isWinner ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-500'}`}>
+                                {idx + 1}
+                              </span>
+                              <span className="font-medium text-xs text-ink-900 truncate">{bidder?.display_name ?? 'Member'}</span>
+                              {isWinner && <span className="text-[9px] bg-brand-600 text-white font-extrabold px-1 rounded uppercase tracking-wider">Lowest Ask</span>}
+                            </div>
+                            <div className="text-right">
+                              <span className="font-bold text-xs text-ink-950 block">Discount: {b.discount_amount} XLM</span>
+                              <span className="text-[10px] text-ink-400 block">Net payout: {netPayout} XLM</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Submit Bid Form */}
+                {isMember && myMember && !myMember.has_received_payout && (
+                  <form onSubmit={handlePlaceBid} className="border-t border-ink-100 pt-4 space-y-3">
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <label className="label text-[10px] uppercase font-bold text-ink-400">Discount Bid (XLM)</label>
+                        <input
+                          type="number"
+                          step="any"
+                          min={0}
+                          max={contribution_amount * member_count - 1}
+                          className="input py-1 text-xs"
+                          value={bidDiscount}
+                          onChange={e => setBidDiscount(e.target.value)}
+                          placeholder="e.g. 5"
+                          required
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="label text-[10px] uppercase font-bold text-ink-400">Your Net Payout</label>
+                        <div className="input py-1 text-xs bg-ink-50 text-ink-500 flex items-center">
+                          {Math.max(0, (contribution_amount * member_count) - (Number(bidDiscount) || 0))} XLM
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={biddingBusy}
+                      className="btn-primary btn-sm w-full justify-center"
+                    >
+                      {biddingBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <><Gavel className="h-3.5 w-3.5" /> Submit Cycle Bid</>}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+          )}
+
           <MembersSection
             detail={detail}
             onDefault={isOrganizer && status === 'active' ? (mid) => guard(() => handleDefault(committeeId, mid, identity!), 'Member marked defaulted')() : undefined}
@@ -289,6 +393,14 @@ function MembersSection({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <span className="truncate text-sm font-semibold text-ink-900">{m.display_name}</span>
+                  {m.credit_score !== undefined && (
+                    <span 
+                      className={`badge text-[9px] font-bold px-1 py-0.2 ${m.credit_score >= 800 ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : m.credit_score >= 700 ? 'bg-emerald-50/50 text-emerald-600 ring-1 ring-emerald-100' : m.credit_score >= 600 ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200' : 'bg-danger-50 text-danger-700 ring-1 ring-danger-200'}`}
+                      title="Reputation Credit Score"
+                    >
+                      ★ {m.credit_score}
+                    </span>
+                  )}
                   {isYou && <span className="badge bg-sapphire-50 text-sapphire-700 ring-1 ring-sapphire-200">You</span>}
                   {isOrganizerRow && <Crown className="h-3.5 w-3.5 text-saffron-500" />}
                   {isNext && <span className="badge bg-brand-50 text-brand-700 ring-1 ring-brand-200"><Gift className="h-3 w-3" /> Next</span>}

@@ -4,7 +4,7 @@
 import { apiGet, apiPost, getStoredToken } from './api';
 import { signTx } from './wallet';
 import type {
-  Committee, CommitteeDetail, Identity,
+  Committee, CommitteeDetail, Identity, Bid, AnchorTx,
 } from './types';
 
 // ── XLM formatting ─────────────────────────────────────────────────────────────
@@ -145,6 +145,30 @@ export async function fetchMemberCount(committeeId: string): Promise<number> {
   } catch {
     return 0;
   }
+}
+
+// ── Bidding & Anchor API methods ──────────────────────────────────────────────
+
+export async function submitBid(committeeId: string, discountAmount: number): Promise<Bid> {
+  return apiPost<Bid>(`/committees/${committeeId}/bid`, { discount_amount: discountAmount });
+}
+
+export async function fetchAnchorTransactions(): Promise<AnchorTx[]> {
+  return apiGet<AnchorTx[]>('/users/anchor-tx');
+}
+
+export async function createAnchorTransaction(
+  txType: 'deposit' | 'withdrawal',
+  amountInr: number,
+  amountXlm: number,
+  bankDetails: string,
+): Promise<AnchorTx> {
+  return apiPost<AnchorTx>('/users/anchor-tx', {
+    tx_type: txType,
+    amount_inr: amountInr,
+    amount_xlm: amountXlm,
+    bank_details: bankDetails,
+  });
 }
 
 export { STROOPS_PER_XLM } from './types';

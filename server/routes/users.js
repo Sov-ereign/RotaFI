@@ -1,5 +1,5 @@
 import express from 'express';
-import { User, Committee, Member } from '../models.js';
+import { User, Committee, Member, AnchorTx } from '../models.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -21,6 +21,7 @@ router.get('/profile', requireAuth, async (req, res) => {
       email: user.email,
       walletAddress: user.walletAddress,
       bio: user.bio,
+      credit_score: user.credit_score || 650,
       createdAt: user.createdAt,
       stats: {
         committeesCreated: asOrganizer,
@@ -75,6 +76,48 @@ router.get('/my-committees', requireAuth, async (req, res) => {
 
     const committees = await Committee.find({ _id: { $in: allIds } }).sort({ created_at: -1 });
     res.json(committees.map(c => c.toJSON()));
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+// GET /api/users/anchor-tx — simulated transactions list
+router.get('/anchor-tx', requireAuth, async (req, res) => {
+  try {
+    const txs = await AnchorTx.find({ user_id: req.user.id }).sort({ created_at: -1 });
+    res.json(txs.map(t => t.toJSON()));
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+// POST /api/users/anchor-tx — simulated deposit/withdrawal
+router.post('/anchor-tx', requireAuth, async (req, res) => {
+  try {
+    const { tx_type, amount_inr, amount_xlm, bank_details } = req.body;
+    if (!tx_type || !amount_inr || !amount_xlm) {
+      return res.status(400).json({ message: 'Missing required transaction fields' });
+    }
+
+    const tx = await AnchorTx.create({
+      user_id: req.user.id,
+      tx_type,
+      amount_inr,
+      amount_xlm,
+      bank_details: bank_details || 'UPI Payment Direct',
+      status: 'completed',
+    });
+
+    // Reward deposit with credit score boost!
+    if (tx_type === 'deposit') {
+      const user = await User.findById(req.user.id);
+      if (user) {
+        user.credit_score = Math.min(900, (user.credit_score || 650) + 10);
+        await user.save();
+      }
+    }
+
+    res.status(201).json(tx.toJSON());
   } catch (e) {
     res.status(500).json({ message: e.message });
   }

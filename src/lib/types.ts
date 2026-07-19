@@ -18,6 +18,7 @@ export interface Identity {
   email: string;
   publicKey: string | null;     // Freighter wallet address (optional link)
   bio: string;
+  credit_score?: number;        // credit/trust score
   network: string;
   token: string;                // JWT for API requests
   createdAt: string;
@@ -53,6 +54,7 @@ export interface Member {
   display_name: string;
   payout_position: number | null;
   has_received_payout: boolean;
+  credit_score?: number;        // credit score of the user associated
   joined_at: string;
 }
 
@@ -90,6 +92,29 @@ export interface ActivityLog {
   created_at: string;
 }
 
+// ── Bid (Bidding Payout Variant) ──────────────────────────────────────────────
+export interface Bid {
+  id: string;
+  committee_id: string;
+  user_id: string;
+  member_id: string;
+  cycle_index: number;
+  discount_amount: number; // in XLM
+  created_at: string;
+}
+
+// ── AnchorTx (Simulated Fiat Anchor) ──────────────────────────────────────────
+export interface AnchorTx {
+  id: string;
+  user_id: string;
+  tx_type: 'deposit' | 'withdrawal';
+  amount_inr: number;
+  amount_xlm: number;
+  status: 'completed' | 'failed';
+  bank_details: string;
+  created_at: string;
+}
+
 // ── Joined shapes ─────────────────────────────────────────────────────────────
 
 export interface MemberWithStatus extends Member {
@@ -111,4 +136,5 @@ export interface CommitteeDetail extends Committee {
   isMember: boolean;
   myMember: MemberWithStatus | null;
   nextRecipient: MemberWithStatus | null;
+  bids?: Bid[];
 }

@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import {
   User, Mail, Wallet, Shield, Edit2, Save, X, Loader2, ExternalLink,
   CalendarDays, Star, TrendingUp, Copy, Check, Link2Off, AlertCircle,
+  Send, Landmark, History, ArrowUpDown, ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { avatarGradient, initials, shortAddress, isFreighterSync } from '../lib/wallet';
 import { apiGet } from '../lib/api';
-import type { Committee } from '../lib/types';
+import { fetchAnchorTransactions, createAnchorTransaction } from '../lib/contract';
+import type { Committee, AnchorTx } from '../lib/types';
 
 interface ProfileStats {
   committeesCreated: number;
@@ -23,17 +25,31 @@ export function ProfilePage() {
   const [copied, setCopied] = useState(false);
   const [myCommittees, setMyCommittees] = useState<Committee[]>([]);
   const [stats, setStats] = useState<ProfileStats | null>(null);
+  const [creditScore, setCreditScore] = useState(650);
+  const [anchorTxs, setAnchorTxs] = useState<AnchorTx[]>([]);
+  const [anchorAmountInr, setAnchorAmountInr] = useState('');
+  const [anchorAmountXlm, setAnchorAmountXlm] = useState('');
+  const [anchorType, setAnchorType] = useState<'deposit' | 'withdrawal'>('deposit');
+  const [upiId, setUpiId] = useState('');
+  const [simulatingAnchor, setSimulatingAnchor] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
-  useEffect(() => {
+  const loadProfileData = () => {
     if (!identity) return;
     Promise.all([
-      apiGet<{ stats: ProfileStats } & Record<string, unknown>>('/users/profile'),
+      apiGet<{ stats: ProfileStats; credit_score: number } & Record<string, unknown>>('/users/profile'),
       apiGet<Committee[]>('/users/my-committees'),
-    ]).then(([profile, committees]) => {
+      fetchAnchorTransactions(),
+    ]).then(([profile, committees, txs]) => {
       setStats(profile.stats);
+      setCreditScore(profile.credit_score || 650);
       setMyCommittees(committees);
+      setAnchorTxs(txs);
     }).catch(() => {}).finally(() => setLoadingData(false));
+  };
+
+  useEffect(() => {
+    loadProfileData();
   }, [identity]);
 
   if (!identity) {
@@ -85,6 +101,35 @@ export function ProfilePage() {
       toast({ kind: 'success', title: 'Wallet unlinked' });
     } catch (e) {
       toast({ kind: 'error', title: 'Unlink failed', description: e instanceof Error ? e.message : '' });
+    }
+  };
+
+  const handleAnchorSimulate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const inr = Number(anchorAmountInr);
+    const xlm = Number(anchorAmountXlm);
+    if (!inr || !xlm || !upiId.trim()) {
+      toast({ kind: 'error', title: 'Invalid inputs', description: 'Enter amount and payment details.' });
+      return;
+    }
+    setSimulatingAnchor(true);
+    try {
+      await createAnchorTransaction(anchorType, inr, xlm, upiId.trim());
+      toast({
+        kind: 'success',
+        title: anchorType === 'deposit' ? 'INR Deposit Settled' : 'XLM Withdrawal Settled',
+        description: anchorType === 'deposit'
+          ? `Anchor received ₹${inr} and credited ${xlm} XLM. Credit score boosted!`
+          : `Anchor received ${xlm} XLM and paid ₹${inr} via UPI.`
+      });
+      setAnchorAmountInr('');
+      setAnchorAmountXlm('');
+      setUpiId('');
+      loadProfileData();
+    } catch (err) {
+      toast({ kind: 'error', title: 'Anchor Settlement Failed', description: err instanceof Error ? err.message : '' });
+    } finally {
+      setSimulatingAnchor(false);
     }
   };
 
@@ -141,6 +186,56 @@ export function ProfilePage() {
               </div>
             </div>
           )}
+
+          {/* Credit Trust Score */}
+          <div className="card p-5 space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-400 flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" /> Credit Trust Score
+            </h3>
+            
+            {/* Speed Gauge Meter */}
+            <div className="relative flex flex-col items-center justify-center pt-2">
+              <svg className="w-32 h-20" viewBox="0 0 100 60">
+                {/* Background arc */}
+                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" strokeWidth="10" strokeLinecap="round" />
+                {/* Foreground arc */}
+                <path 
+                  d="M 10 50 A 40 40 0 0 1 90 50" 
+                  fill="none" 
+                  stroke="url(#scoreGradient)" 
+                  strokeWidth="10" 
+                  strokeLinecap="round"
+                  strokeDasharray="125.6"
+                  strokeDashoffset={125.6 - (125.6 * Math.max(0, creditScore - 300)) / 600}
+                />
+                <defs>
+                  <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="50%" stopColor="#f59e0b" />
+                    <stop offset="100%" stopColor="#10b981" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute bottom-1 text-center">
+                <span className="text-2xl font-extrabold text-ink-900">{creditScore}</span>
+                <span className="block text-[9px] uppercase font-bold text-ink-400 tracking-wider">
+                  {creditScore >= 800 ? 'Excellent' : creditScore >= 700 ? 'Good' : creditScore >= 600 ? 'Fair' : 'Poor'}
+                </span>
+              </div>
+            </div>
+
+            <div className="text-xs text-ink-500 text-center leading-relaxed">
+              Based on your RotaFi ROSCA repayment reputation. Higher scores unlock lower bidding rates and higher pool limits.
+            </div>
+
+            {/* Score booster tips */}
+            <div className="rounded-lg bg-ink-50 p-2.5 text-[10px] text-ink-600 leading-snug">
+              <span className="font-semibold block text-brand-600 mb-0.5">🚀 Score Boosters:</span>
+              • Contribute on-time (+15)<br />
+              • Complete a full group (+30)<br />
+              • Deposit fiat via anchor (+10)
+            </div>
+          </div>
         </div>
 
         {/* ── Right: details ── */}
@@ -274,6 +369,121 @@ export function ProfilePage() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Stellar Fiat Anchor (INR ↔ XLM) */}
+          <div className="card p-5 space-y-4">
+            <h3 className="font-semibold text-ink-900 flex items-center gap-2">
+              <Landmark className="h-4.5 w-4.5 text-brand-500" /> Stellar Fiat Anchor (INR ↔ XLM)
+            </h3>
+            <p className="text-xs text-ink-400">
+              Simulate Indian Rupee (INR) on/off-ramping. Swap INR for native XLM token assets instantly via anchor UPI bank transfer.
+            </p>
+
+            <form onSubmit={handleAnchorSimulate} className="space-y-3 bg-ink-50/50 rounded-xl p-3.5 ring-1 ring-ink-100">
+              <div className="flex rounded-lg bg-ink-200 p-0.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => { setAnchorType('deposit'); setAnchorAmountInr(''); setAnchorAmountXlm(''); }}
+                  className={`flex-1 rounded-md py-1 font-semibold transition ${anchorType === 'deposit' ? 'bg-white text-ink-900 shadow-soft' : 'text-ink-500 hover:text-ink-700'}`}
+                >
+                  Deposit (INR → XLM)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAnchorType('withdrawal'); setAnchorAmountInr(''); setAnchorAmountXlm(''); }}
+                  className={`flex-1 rounded-md py-1 font-semibold transition ${anchorType === 'withdrawal' ? 'bg-white text-ink-900 shadow-soft' : 'text-ink-500 hover:text-ink-700'}`}
+                >
+                  Withdraw (XLM → INR)
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="label text-[10px]">INR Amount (₹)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    className="input py-1 text-xs"
+                    value={anchorAmountInr}
+                    onChange={e => {
+                      const inr = e.target.value;
+                      setAnchorAmountInr(inr);
+                      setAnchorAmountXlm(inr ? (Number(inr) / 10).toFixed(2) : '');
+                    }}
+                    placeholder="e.g. 500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="label text-[10px]">XLM Received</label>
+                  <input
+                    type="number"
+                    className="input py-1 text-xs bg-ink-100/50 text-ink-500"
+                    value={anchorAmountXlm}
+                    readOnly
+                    placeholder="50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="label text-[10px]">
+                  {anchorType === 'deposit' ? 'Pay via UPI ID' : 'Withdrawal UPI ID / VPA'}
+                </label>
+                <input
+                  type="text"
+                  className="input py-1 text-xs"
+                  value={upiId}
+                  onChange={e => setUpiId(e.target.value)}
+                  placeholder="e.g. upi-address@paytm"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={simulatingAnchor}
+                className="btn-primary btn-sm w-full justify-center"
+              >
+                {simulatingAnchor ? (
+                  <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Settling...</>
+                ) : anchorType === 'deposit' ? (
+                  <><Send className="h-3.5 w-3.5" /> Deposit ₹{anchorAmountInr || '0'}</>
+                ) : (
+                  <><ArrowUpDown className="h-3.5 w-3.5" /> Withdraw ₹{anchorAmountInr || '0'}</>
+                )}
+              </button>
+            </form>
+
+            {/* Anchor Transactions history */}
+            <div className="space-y-2 pt-2">
+              <h4 className="text-xs font-semibold text-ink-500 flex items-center gap-1.5">
+                <History className="h-3.5 w-3.5" /> Settle History
+              </h4>
+              {anchorTxs.length === 0 ? (
+                <p className="text-[11px] text-ink-400 italic text-center py-3">No anchor transfers settled yet.</p>
+              ) : (
+                <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 text-xs">
+                  {anchorTxs.map(tx => (
+                    <div key={tx.id} className="flex items-center justify-between border-b border-ink-100 pb-1.5 last:border-0">
+                      <div>
+                        <span className={`inline-block text-[9px] uppercase font-bold px-1 py-0.2 rounded mr-1.5 ${tx.tx_type === 'deposit' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100' : 'bg-sapphire-50 text-sapphire-700 ring-1 ring-sapphire-100'}`}>
+                          {tx.tx_type}
+                        </span>
+                        <span className="text-ink-800 font-medium">₹{tx.amount_inr}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-ink-950 font-bold block">{tx.amount_xlm} XLM</span>
+                        <span className="text-[9px] text-ink-400 block">
+                          {new Date(tx.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

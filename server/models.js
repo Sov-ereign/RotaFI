@@ -17,6 +17,7 @@ const UserSchema = new Schema({
   password:      { type: String, required: true },
   walletAddress: { type: String, default: null },
   bio:           { type: String, default: '', maxlength: 280 },
+  credit_score:  { type: Number, default: 650, min: 300, max: 900 },
   createdAt:     { type: Date, default: Date.now },
 }, { toJSON });
 
@@ -96,3 +97,29 @@ const ActivityLogSchema = new Schema({
 }, { toJSON });
 
 export const ActivityLog = mongoose.model('ActivityLog', ActivityLogSchema);
+
+// ── Bid (Bidding Payout Variant) ──────────────────────────────────────────────
+const BidSchema = new Schema({
+  committee_id:    { type: Schema.Types.ObjectId, ref: 'Committee', required: true },
+  user_id:         { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  member_id:       { type: Schema.Types.ObjectId, ref: 'Member', required: true },
+  cycle_index:     { type: Number, required: true },
+  discount_amount: { type: Number, required: true }, // amount in XLM (e.g. 5 XLM) user is willing to discount
+  created_at:      { type: Date, default: Date.now },
+}, { toJSON });
+
+export const Bid = mongoose.model('Bid', BidSchema);
+
+// ── AnchorTx (Simulated Anchor integration) ───────────────────────────────────
+const AnchorTxSchema = new Schema({
+  user_id:       { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  tx_type:       { type: String, enum: ['deposit', 'withdrawal'], required: true },
+  amount_inr:    { type: Number, required: true },
+  amount_xlm:    { type: Number, required: true },
+  status:        { type: String, enum: ['pending', 'completed', 'failed'], default: 'completed' },
+  bank_details:  { type: String, default: 'UPI Payment Direct' },
+  created_at:    { type: Date, default: Date.now },
+}, { toJSON });
+
+export const AnchorTx = mongoose.model('AnchorTx', AnchorTxSchema);
+

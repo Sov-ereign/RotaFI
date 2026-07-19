@@ -1,5 +1,5 @@
 import express from 'express';
-import { Committee, Member, Contribution, Payout, ActivityLog } from '../models.js';
+import { Committee, Member, Contribution, Payout, ActivityLog, Bid, User } from '../models.js';
 import { requireAuth, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -10,7 +10,7 @@ async function logActivity(committeeId, eventType, actorWallet, summary, metadat
   await ActivityLog.create({ committee_id: committeeId, event_type: eventType, actor_wallet: actorWallet, summary, metadata });
 }
 
-function buildDetail(committee, members, contributions, payouts, activity, userId, walletAddress) {
+function buildDetail(committee, members, contributions, payouts, activity, userId, walletAddress, bids = []) {
   const membersWithStatus = members.map(m => {
     const mc = contributions.filter(c => c.member_id.toString() === m._id.toString());
     const cur = mc.find(c => c.cycle_index === committee.current_cycle) ?? null;
@@ -49,6 +49,7 @@ function buildDetail(committee, members, contributions, payouts, activity, userI
     isMember: !!myMember,
     myMember,
     nextRecipient,
+    bids: bids.map(b => b.toJSON()),
   };
 }
 
@@ -73,24 +74,34 @@ router.get('/:id', optionalAuth, async (req, res) => {
     const committee = await Committee.findById(req.params.id);
     if (!committee) return res.status(404).json({ message: 'Committee not found' });
 
-    const [members, contributions, payouts, activity] = await Promise.all([
+    const [membersDocs, contributions, payouts, activity, bids] = await Promise.all([
       Member.find({ committee_id: committee._id }).sort({ joined_at: 1 }),
       Contribution.find({ committee_id: committee._id }).sort({ cycle_index: 1 }),
       Payout.find({ committee_id: committee._id }).sort({ cycle_index: 1 }),
       ActivityLog.find({ committee_id: committee._id }).sort({ created_at: -1 }).limit(40),
+      Bid.find({ committee_id: committee._id, cycle_index: committee.current_cycle }).sort({ discount_amount: -1 }),
     ]);
+
+    // Attach credit score to each member
+    const members = await Promise.all(membersDocs.map(async m => {
+      let score = 650;
+      if (m.user_id) {
+        const u = await User.findById(m.user_id).select('credit_score');
+        if (u) score = u.credit_score || 650;
+      }
+      return { ...m.toJSON(), credit_score: score };
+    }));
 
     // Attach wallet from user if authenticated
     let walletAddress = committee.organizer_wallet; // fallback
     if (req.user) {
-      const { User } = await import('../models.js');
       const u = await User.findById(req.user.id).select('walletAddress');
       walletAddress = u?.walletAddress ?? null;
     } else {
       walletAddress = null;
     }
 
-    res.json(buildDetail(committee, members, contributions, payouts, activity, req.user?.id, walletAddress));
+    res.json(buildDetail(committee, members, contributions, payouts, activity, req.user?.id, walletAddress, bids));
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
@@ -248,6 +259,12 @@ router.post('/:id/contribute', requireAuth, async (req, res) => {
       tx_hash: txHash || null,
     });
 
+    // Credit score boost for paying on time!
+    if (user) {
+      user.credit_score = Math.min(900, (user.credit_score || 650) + 15);
+      await user.save();
+    }
+
     await logActivity(committee._id, 'contribution_paid', user.walletAddress,
       `${user.name} contributed ${committee.contribution_amount} XLM for cycle ${committee.current_cycle + 1}`,
       { cycle: committee.current_cycle, amount: committee.contribution_amount, tx_hash: txHash });
@@ -284,17 +301,54 @@ router.post('/:id/advance', requireAuth, async (req, res) => {
     const allDone = cycleContribs.every(c => c.status === 'paid' || c.status === 'excused');
     if (!allDone) return res.status(400).json({ message: 'Not all members have contributed' });
 
-    const payout = await Payout.findOne({ committee_id: committee._id, cycle_index: committee.current_cycle });
+    let payout = await Payout.findOne({ committee_id: committee._id, cycle_index: committee.current_cycle });
     if (!payout) return res.status(400).json({ message: 'No scheduled payout' });
+
+    let finalAmount = payout.amount;
+    let recipientId = payout.recipient_member_id;
+    let winningBid = null;
+
+    if (committee.payout_rule === 'bidding') {
+      const bids = await Bid.find({ committee_id: committee._id, cycle_index: committee.current_cycle });
+      if (bids.length > 0) {
+        // Find highest discount bid (willing to accept lowest payout)
+        bids.sort((a, b) => b.discount_amount - a.discount_amount);
+        winningBid = bids[0];
+        recipientId = winningBid.member_id;
+        finalAmount = (committee.contribution_amount * committee.member_count) - winningBid.discount_amount;
+
+        // Update payout details
+        payout.recipient_member_id = recipientId;
+        payout.amount = finalAmount;
+        await payout.save();
+      }
+    }
 
     const { txHash } = req.body;
     await Payout.findByIdAndUpdate(payout._id, { status: 'released', released_at: new Date(), tx_hash: txHash || null });
-    await Member.findByIdAndUpdate(payout.recipient_member_id, { has_received_payout: true });
+    await Member.findByIdAndUpdate(recipientId, { has_received_payout: true });
 
-    const recipient = await Member.findById(payout.recipient_member_id);
-    await logActivity(committee._id, 'payout_released', user.walletAddress,
-      `Cycle ${committee.current_cycle + 1} pot of ${payout.amount} XLM released to ${recipient?.display_name ?? 'recipient'}`,
-      { cycle: committee.current_cycle, tx_hash: txHash });
+    const recipient = await Member.findById(recipientId);
+
+    // Reward winning bidder with +30 credit score!
+    if (recipient && recipient.user_id) {
+      const u = await User.findById(recipient.user_id);
+      if (u) {
+        u.credit_score = Math.min(900, (u.credit_score || 650) + 30);
+        await u.save();
+      }
+    }
+
+    if (winningBid && winningBid.discount_amount > 0) {
+      const discountShared = winningBid.discount_amount / Math.max(1, committee.member_count - 1);
+      await logActivity(committee._id, 'payout_released', user.walletAddress,
+        `Cycle ${committee.current_cycle + 1} bidding won by ${recipient?.display_name ?? 'Member'} with discount bid of ${winningBid.discount_amount} XLM. Pot of ${finalAmount} XLM released. Savings dividend of ${discountShared.toFixed(2)} XLM credited back to all other members.`,
+        { cycle: committee.current_cycle, tx_hash: txHash, discount: winningBid.discount_amount });
+    } else {
+      await logActivity(committee._id, 'payout_released', user.walletAddress,
+        `Cycle ${committee.current_cycle + 1} pot of ${finalAmount} XLM released to ${recipient?.display_name ?? 'recipient'}`,
+        { cycle: committee.current_cycle, tx_hash: txHash });
+    }
 
     const nextCycle = committee.current_cycle + 1;
 
@@ -320,7 +374,7 @@ router.post('/:id/advance', requireAuth, async (req, res) => {
     })));
 
     const remaining = members
-      .filter(m => !m.has_received_payout && m._id.toString() !== payout.recipient_member_id.toString())
+      .filter(m => !m.has_received_payout && m._id.toString() !== recipientId.toString())
       .sort((a, b) => (a.payout_position ?? 99) - (b.payout_position ?? 99));
 
     if (remaining.length > 0) {
@@ -361,6 +415,16 @@ router.post('/:id/default/:memberId', requireAuth, async (req, res) => {
 
     await Contribution.findByIdAndUpdate(contrib._id, { status: 'defaulted' });
     const member = await Member.findById(req.params.memberId);
+
+    // Credit score penalty for defaulting!
+    if (member && member.user_id) {
+      const defaultedUser = await User.findById(member.user_id);
+      if (defaultedUser) {
+        defaultedUser.credit_score = Math.max(300, (defaultedUser.credit_score || 650) - 100);
+        await defaultedUser.save();
+      }
+    }
+
     await logActivity(committee._id, 'member_defaulted', user.walletAddress,
       `${member?.display_name ?? 'Member'} defaulted on cycle ${committee.current_cycle + 1}`);
     res.json({ ok: true });
@@ -390,6 +454,45 @@ router.post('/:id/excuse/:memberId', requireAuth, async (req, res) => {
     await logActivity(committee._id, 'member_excused', user.walletAddress,
       `${member?.display_name ?? 'Member'} excused from cycle ${committee.current_cycle + 1}`);
     res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+// ── POST /api/committees/:id/bid ──────────────────────────────────────────────
+router.post('/:id/bid', requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const committee = await Committee.findById(req.params.id);
+    if (!committee) return res.status(404).json({ message: 'Committee not found' });
+    if (committee.status !== 'active') return res.status(400).json({ message: 'Committee is not active' });
+    if (committee.payout_rule !== 'bidding') return res.status(400).json({ message: 'This committee does not support bidding' });
+
+    const member = await Member.findOne({ committee_id: committee._id, user_id: user._id });
+    if (!member) return res.status(403).json({ message: 'You are not a member of this committee' });
+    if (member.has_received_payout) return res.status(400).json({ message: 'You have already received your payout' });
+
+    const { discount_amount } = req.body;
+    if (discount_amount === undefined || Number(discount_amount) < 0) {
+      return res.status(400).json({ message: 'Invalid discount amount' });
+    }
+
+    const maxDiscount = committee.contribution_amount * committee.member_count;
+    if (Number(discount_amount) >= maxDiscount) {
+      return res.status(400).json({ message: `Bid discount must be less than the total pot size of ${maxDiscount} XLM` });
+    }
+
+    const bid = await Bid.findOneAndUpdate(
+      { committee_id: committee._id, member_id: member._id, cycle_index: committee.current_cycle },
+      { user_id: user._id, discount_amount: Number(discount_amount) },
+      { upsert: true, new: true }
+    );
+
+    await logActivity(committee._id, 'bid_submitted', user.walletAddress,
+      `${user.name} submitted a discount bid of ${discount_amount} XLM for cycle ${committee.current_cycle + 1}`,
+      { cycle: committee.current_cycle, discount_amount });
+
+    res.json(bid.toJSON());
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
