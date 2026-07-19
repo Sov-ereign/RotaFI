@@ -18,6 +18,9 @@ const CreateCommitteePage = lazy(() =>
 const CommitteeDetailPage = lazy(() =>
   import('./pages/CommitteeDetailPage').then((m) => ({ default: m.CommitteeDetailPage })),
 );
+const ProfilePage = lazy(() =>
+  import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })),
+);
 
 function PageFallback() {
   return (
@@ -75,6 +78,7 @@ function Router() {
     case 'explore': page = <Suspense fallback={<PageFallback />}><ExplorePage /></Suspense>; break;
     case 'create': page = <Suspense fallback={<PageFallback />}><CreateCommitteePage /></Suspense>; break;
     case 'committee': page = <Suspense fallback={<PageFallback />}><CommitteeDetailPage committeeId={route.id} /></Suspense>; break;
+    case 'profile': page = <Suspense fallback={<PageFallback />}><ProfilePage /></Suspense>; break;
     default: page = <LandingPage />;
   }
 

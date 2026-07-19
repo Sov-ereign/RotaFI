@@ -1,91 +1,187 @@
 import { useState } from 'react';
-import { Wallet, LogOut, Copy, Check, ChevronDown, ExternalLink, AlertCircle, Edit2 } from 'lucide-react';
+import {
+  Wallet, LogOut, Copy, Check, ChevronDown, ExternalLink,
+  AlertCircle, Edit2, User, Mail, Lock, Eye, EyeOff, X, Loader2,
+} from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { avatarGradient, initials, shortAddress } from '../lib/wallet';
+import { avatarGradient, initials, shortAddress, isFreighterSync } from '../lib/wallet';
 import { Modal } from './Modal';
 
+// ── Auth Modal ─────────────────────────────────────────────────────────────────
+
+function AuthModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { register, login, navigate, toast } = useApp();
+  const [tab, setTab] = useState<'login' | 'register'>('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  const reset = () => { setName(''); setEmail(''); setPassword(''); setErr(''); setBusy(false); };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr('');
+    setBusy(true);
+    try {
+      if (tab === 'register') {
+        if (name.trim().length < 2) { setErr('Name must be at least 2 characters'); setBusy(false); return; }
+        if (password.length < 6) { setErr('Password must be at least 6 characters'); setBusy(false); return; }
+        await register(name.trim(), email.trim(), password);
+        toast({ kind: 'success', title: 'Welcome to RotaFi!', description: 'Your account is ready.' });
+        navigate({ name: 'dashboard' });
+      } else {
+        await login(email.trim(), password);
+        toast({ kind: 'success', title: 'Signed in', description: 'Welcome back!' });
+        navigate({ name: 'dashboard' });
+      }
+      onClose();
+      reset();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Something went wrong');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal
+      open={open}
+      onClose={() => { onClose(); reset(); }}
+      title=""
+    >
+      {/* Tabs */}
+      <div className="mb-6 flex rounded-xl bg-ink-100 p-1">
+        {(['login', 'register'] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => { setTab(t); setErr(''); }}
+            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${tab === t ? 'bg-white text-ink-900 shadow-soft' : 'text-ink-500 hover:text-ink-700'}`}
+          >
+            {t === 'login' ? 'Sign in' : 'Create account'}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={submit} className="space-y-4">
+        {tab === 'register' && (
+          <div>
+            <label className="label flex items-center gap-1.5"><User className="h-3.5 w-3.5" />Display name</label>
+            <input className="input" value={name} onChange={e => setName(e.target.value)}
+              placeholder="e.g. Priya Sharma" autoFocus={tab === 'register'} required maxLength={40} />
+          </div>
+        )}
+
+        <div>
+          <label className="label flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" />Email</label>
+          <input className="input" type="email" value={email} onChange={e => setEmail(e.target.value)}
+            placeholder="you@example.com" autoFocus={tab === 'login'} required />
+        </div>
+
+        <div>
+          <label className="label flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" />Password</label>
+          <div className="relative">
+            <input className="input pr-10" type={showPw ? 'text' : 'password'} value={password}
+              onChange={e => setPassword(e.target.value)} required minLength={6}
+              placeholder={tab === 'register' ? 'At least 6 characters' : '••••••••'} />
+            <button type="button" onClick={() => setShowPw(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-600">
+              {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+
+        {err && (
+          <div className="flex items-start gap-2 rounded-lg bg-danger-50 px-3 py-2.5 text-sm text-danger-700 ring-1 ring-danger-200">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{err}</span>
+          </div>
+        )}
+
+        <button type="submit" disabled={busy}
+          className="btn-primary w-full justify-center">
+          {busy ? <><Loader2 className="h-4 w-4 animate-spin" />{tab === 'login' ? 'Signing in…' : 'Creating account…'}</> : (tab === 'login' ? 'Sign in' : 'Create account')}
+        </button>
+      </form>
+
+      <p className="mt-4 text-center text-xs text-ink-400">
+        {tab === 'login' ? "Don't have an account? " : 'Already have an account? '}
+        <button className="font-semibold text-brand-600 hover:text-brand-700"
+          onClick={() => { setTab(tab === 'login' ? 'register' : 'login'); setErr(''); }}>
+          {tab === 'login' ? 'Sign up' : 'Sign in'}
+        </button>
+      </p>
+    </Modal>
+  );
+}
+
+// ── WalletBar ─────────────────────────────────────────────────────────────────
+
 export function WalletBar() {
-  const { identity, freighterInstalled, connect, signOut, navigate, toast, setDisplayName } = useApp();
-  const [connecting, setConnecting] = useState(false);
+  const { identity, freighterInstalled, freighterChecking, linkWallet, logout, navigate, toast } = useApp();
+  const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [editNameOpen, setEditNameOpen] = useState(false);
-  const [nameInput, setNameInput] = useState('');
+  const [linkingWallet, setLinkingWallet] = useState(false);
 
-  // ── Not connected ──────────────────────────────────────────────────────────
-
+  // ── Not logged in ────────────────────────────────────────────────────────────
   if (!identity) {
-    if (!freighterInstalled) {
-      return (
-        <>
-          <a
-            href="https://www.freighter.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary btn-sm flex items-center gap-1.5"
-          >
-            <AlertCircle className="h-4 w-4 text-saffron-500" />
-            Install Freighter
-            <ExternalLink className="h-3 w-3 opacity-60" />
-          </a>
-        </>
-      );
-    }
-
     return (
-      <button
-        className="btn-primary btn-sm"
-        disabled={connecting}
-        onClick={async () => {
-          setConnecting(true);
-          try {
-            await connect();
-            toast({ kind: 'success', title: 'Freighter connected', description: 'Your Stellar wallet is ready.' });
-            navigate({ name: 'dashboard' });
-          } catch (e) {
-            toast({
-              kind: 'error',
-              title: 'Connection failed',
-              description: e instanceof Error ? e.message : 'Could not connect to Freighter.',
-            });
-          } finally {
-            setConnecting(false);
-          }
-        }}
-      >
-        <Wallet className="h-4 w-4" />
-        {connecting ? 'Connecting…' : 'Connect Freighter'}
-      </button>
+      <>
+        <button
+          className="btn-primary btn-sm"
+          onClick={() => setAuthOpen(true)}
+        >
+          <Wallet className="h-4 w-4" /> Connect
+        </button>
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      </>
     );
   }
 
-  // ── Connected ──────────────────────────────────────────────────────────────
+  // ── Logged in ────────────────────────────────────────────────────────────────
 
   const copyAddr = async () => {
-    try {
-      await navigator.clipboard.writeText(identity.publicKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
-    } catch { /* ignore */ }
+    if (!identity.publicKey) return;
+    await navigator.clipboard.writeText(identity.publicKey).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1400);
   };
+
+  const handleLinkWallet = async () => {
+    setLinkingWallet(true);
+    try {
+      await linkWallet();
+      toast({ kind: 'success', title: 'Freighter linked!', description: 'Your Stellar wallet is now connected.' });
+      setMenuOpen(false);
+    } catch (e) {
+      toast({ kind: 'error', title: 'Link failed', description: e instanceof Error ? e.message : 'Could not connect Freighter.' });
+    } finally {
+      setLinkingWallet(false);
+    }
+  };
+
+  const seed = identity.publicKey || identity.email;
 
   return (
     <>
       <div className="relative">
         <button
-          onClick={() => setMenuOpen((v) => !v)}
+          onClick={() => setMenuOpen(v => !v)}
           className="group flex items-center gap-2 rounded-xl bg-white py-1.5 pl-1.5 pr-2.5 ring-1 ring-inset ring-ink-200 transition hover:ring-ink-300"
         >
           <span
-            className="grid h-7 w-7 place-items-center rounded-lg text-[11px] font-bold text-white"
-            style={{ background: avatarGradient(identity.publicKey) }}
+            className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-[11px] font-bold text-white"
+            style={{ background: avatarGradient(seed) }}
           >
             {initials(identity.name)}
           </span>
           <span className="hidden text-left sm:block">
             <span className="block text-xs font-semibold leading-tight text-ink-900">{identity.name}</span>
-            <span className="block font-mono text-[10px] leading-tight text-ink-400">
-              {shortAddress(identity.publicKey)}
+            <span className="block text-[10px] leading-tight text-ink-400">
+              {identity.publicKey ? shortAddress(identity.publicKey) : identity.email.split('@')[0]}
             </span>
           </span>
           <ChevronDown className="h-4 w-4 text-ink-400 transition group-hover:text-ink-600" />
@@ -97,115 +193,95 @@ export function WalletBar() {
             <div className="absolute right-0 z-20 mt-2 w-72 animate-scale-in card p-1.5 shadow-lift">
               {/* Header */}
               <div className="px-3 py-2.5">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-sm font-bold text-white"
-                    style={{ background: avatarGradient(identity.publicKey) }}
-                  >
+                <div className="flex items-center gap-2.5">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-bold text-white"
+                    style={{ background: avatarGradient(seed) }}>
                     {initials(identity.name)}
                   </span>
                   <div className="min-w-0">
-                    <div className="font-semibold text-ink-900 leading-tight">{identity.name}</div>
-                    <div className="text-[10px] font-medium text-brand-600 uppercase tracking-wide">
-                      Stellar {identity.network || 'Testnet'}
-                    </div>
+                    <div className="font-semibold text-ink-900 leading-tight truncate">{identity.name}</div>
+                    <div className="text-[11px] text-ink-400 truncate">{identity.email}</div>
                   </div>
+                </div>
+
+                {/* Wallet status */}
+                <div className="mt-2.5">
+                  {identity.publicKey ? (
+                    <button
+                      onClick={copyAddr}
+                      className="flex w-full items-center justify-between gap-2 rounded-lg bg-ink-50 px-2.5 py-1.5 text-left transition hover:bg-ink-100"
+                    >
+                      <span className="flex items-center gap-1.5 min-w-0">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                        <span className="font-mono text-[11px] text-ink-600 truncate">{shortAddress(identity.publicKey, 10, 8)}</span>
+                      </span>
+                      {copied ? <Check className="h-3.5 w-3.5 shrink-0 text-brand-600" /> : <Copy className="h-3.5 w-3.5 shrink-0 text-ink-400" />}
+                    </button>
+                  ) : (
+                    <div className="rounded-lg bg-amber-50 px-2.5 py-1.5 ring-1 ring-amber-200">
+                      <p className="text-[11px] text-amber-800">No Stellar wallet linked yet</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Address copy */}
-              <button
-                onClick={copyAddr}
-                className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition hover:bg-ink-50"
-              >
-                <span className="font-mono text-[11px] text-ink-500">{shortAddress(identity.publicKey, 10, 8)}</span>
-                {copied ? <Check className="h-4 w-4 text-brand-600" /> : <Copy className="h-4 w-4 text-ink-400" />}
+              <div className="my-1 h-px bg-ink-100" />
+
+              {/* Nav */}
+              <button onClick={() => { setMenuOpen(false); navigate({ name: 'dashboard' }); }}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50">
+                <Wallet className="h-4 w-4 text-ink-400" /> Dashboard
               </button>
+              <button onClick={() => { setMenuOpen(false); navigate({ name: 'profile' }); }}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50">
+                <User className="h-4 w-4 text-ink-400" /> My profile
+              </button>
+
+              {/* Freighter link/unlink */}
+              {!identity.publicKey ? (
+                !freighterChecking && !freighterInstalled ? (
+                  <a href="https://www.freighter.app/" target="_blank" rel="noopener noreferrer"
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-amber-700 transition hover:bg-amber-50"
+                    onClick={() => setMenuOpen(false)}>
+                    <AlertCircle className="h-4 w-4" />
+                    Install Freighter
+                    <ExternalLink className="ml-auto h-3.5 w-3.5 opacity-60" />
+                  </a>
+                ) : (
+                  <button
+                    onClick={handleLinkWallet}
+                    disabled={linkingWallet || freighterChecking}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-brand-700 transition hover:bg-brand-50 disabled:opacity-50"
+                  >
+                    {linkingWallet
+                      ? <><Loader2 className="h-4 w-4 animate-spin" /> Connecting…</>
+                      : <><Edit2 className="h-4 w-4 text-brand-400" /> Link Freighter wallet</>}
+                  </button>
+                )
+              ) : (
+                identity.publicKey && (
+                  <a href={`https://stellar.expert/explorer/testnet/account/${identity.publicKey}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50"
+                    onClick={() => setMenuOpen(false)}>
+                    <ExternalLink className="h-4 w-4 text-ink-400" /> View on Explorer
+                  </a>
+                )
+              )}
 
               <div className="my-1 h-px bg-ink-100" />
 
-              {/* Actions */}
-              <button
-                onClick={() => { setMenuOpen(false); navigate({ name: 'dashboard' }); }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50"
-              >
-                <Wallet className="h-4 w-4 text-ink-400" /> My dashboard
-              </button>
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  setNameInput(identity.name);
-                  setEditNameOpen(true);
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50"
-              >
-                <Edit2 className="h-4 w-4 text-ink-400" /> Edit display name
-              </button>
-              <a
-                href={`https://stellar.expert/explorer/testnet/account/${identity.publicKey}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50"
-                onClick={() => setMenuOpen(false)}
-              >
-                <ExternalLink className="h-4 w-4 text-ink-400" /> View on Explorer
-              </a>
-
-              <div className="my-1 h-px bg-ink-100" />
-
-              <button
-                onClick={() => { setMenuOpen(false); signOut(); }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-danger-600 transition hover:bg-danger-50"
-              >
-                <LogOut className="h-4 w-4" /> Disconnect
+              <button onClick={() => { setMenuOpen(false); logout(); }}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-danger-600 transition hover:bg-danger-50">
+                <LogOut className="h-4 w-4" /> Sign out
               </button>
             </div>
           </>
         )}
       </div>
 
-      {/* Edit name modal */}
-      <Modal
-        open={editNameOpen}
-        onClose={() => setEditNameOpen(false)}
-        title="Edit display name"
-        description="This name is stored locally and shown to other committee members."
-        footer={
-          <div className="flex justify-end gap-2">
-            <button className="btn-ghost btn-sm" onClick={() => setEditNameOpen(false)}>Cancel</button>
-            <button
-              className="btn-primary btn-sm"
-              onClick={() => {
-                if (nameInput.trim()) {
-                  setDisplayName(nameInput.trim());
-                  setEditNameOpen(false);
-                  toast({ kind: 'success', title: 'Name updated' });
-                }
-              }}
-              disabled={!nameInput.trim()}
-            >
-              Save
-            </button>
-          </div>
-        }
-      >
-        <label className="label">Display name</label>
-        <input
-          className="input"
-          value={nameInput}
-          autoFocus
-          maxLength={40}
-          placeholder="e.g. Priya Sharma"
-          onChange={(e) => setNameInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && nameInput.trim()) {
-              setDisplayName(nameInput.trim());
-              setEditNameOpen(false);
-              toast({ kind: 'success', title: 'Name updated' });
-            }
-          }}
-        />
-      </Modal>
+      {/* Suppress unused import warning */}
+      {false && <X />}
     </>
   );
 }

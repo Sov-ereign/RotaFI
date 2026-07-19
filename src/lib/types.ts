@@ -1,6 +1,5 @@
 // Shared domain types for the RotaFi platform.
-// Amounts are in XLM (as JavaScript number, e.g. 5.0 = 5 XLM).
-// When interacting with Soroban, multiply by STROOPS_PER_XLM.
+// Amounts are in XLM (JavaScript number, e.g. 5.0 = 5 XLM).
 
 export const STROOPS_PER_XLM = 10_000_000;
 
@@ -10,11 +9,27 @@ export type ContributionStatus = 'pending' | 'paid' | 'defaulted' | 'excused';
 export type PayoutStatus = 'scheduled' | 'released' | 'forfeited';
 export type PenaltyStrategy = 'delay' | 'penalty' | 'backup_fund';
 
+// ── Auth / User ───────────────────────────────────────────────────────────────
+
+/** The currently authenticated user — stored in context after login/register. */
+export interface Identity {
+  id: string;                   // MongoDB _id
+  name: string;
+  email: string;
+  publicKey: string | null;     // Freighter wallet address (optional link)
+  bio: string;
+  network: string;
+  token: string;                // JWT for API requests
+  createdAt: string;
+}
+
+// ── Committee ─────────────────────────────────────────────────────────────────
+
 export interface Committee {
   id: string;
   name: string;
   description: string | null;
-  /** Contribution amount in XLM (e.g. 5.0 = 5 XLM) */
+  /** Contribution amount in XLM */
   contribution_amount: number;
   cycle_length_days: number;
   member_count: number;
@@ -24,10 +39,11 @@ export interface Committee {
   current_cycle: number;
   status: CommitteeStatus;
   penalty_strategy: PenaltyStrategy;
-  penalty_amount: number; // XLM
+  penalty_amount: number;
   started_at: string | null;
   completed_at: string | null;
   created_at: string;
+  current_member_count?: number; // returned by the list endpoint
 }
 
 export interface Member {
@@ -45,7 +61,6 @@ export interface Contribution {
   committee_id: string;
   member_id: string;
   cycle_index: number;
-  /** Amount in XLM */
   amount: number;
   status: ContributionStatus;
   tx_hash: string | null;
@@ -58,7 +73,6 @@ export interface Payout {
   committee_id: string;
   cycle_index: number;
   recipient_member_id: string;
-  /** Amount in XLM */
   amount: number;
   status: PayoutStatus;
   tx_hash: string | null;
@@ -76,7 +90,8 @@ export interface ActivityLog {
   created_at: string;
 }
 
-// Joined / derived shapes used by the UI.
+// ── Joined shapes ─────────────────────────────────────────────────────────────
+
 export interface MemberWithStatus extends Member {
   contributions: Contribution[];
   totalPaid: number;
@@ -96,12 +111,4 @@ export interface CommitteeDetail extends Committee {
   isMember: boolean;
   myMember: MemberWithStatus | null;
   nextRecipient: MemberWithStatus | null;
-}
-
-export interface Identity {
-  name: string;
-  publicKey: string;
-  /** Network the wallet is connected to */
-  network: string;
-  createdAt: string;
 }
