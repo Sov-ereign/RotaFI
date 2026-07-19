@@ -1,7 +1,6 @@
-
 # RotaFi — Transparent Rotating Savings on Stellar
 
-> Trustless rotating savings groups (ROSCAs / chit funds) powered by Stellar Soroban smart contracts. Transparent cycles, on-chain history — no organizer can run off with the pool.
+> Trustless rotating savings groups (ROSCAs / chit funds) powered by Stellar Soroban smart contracts. Transparent cycles, on-chain history, and portable credit trust scores — no organizer can run off with the pool.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Network: Stellar Testnet](https://img.shields.io/badge/Network-Stellar%20Testnet-purple)](https://stellar.org)
@@ -11,209 +10,122 @@
 
 ## What is RotaFi?
 
-RotaFi digitises the age-old ROSCA (Rotating Savings and Credit Association) model — known as chit funds, committees, or tandas depending on the region. A group of people pool a fixed amount each cycle; one member receives the full pot per cycle until everyone has received it once.
+RotaFi digitizes the traditional ROSCA (Rotating Savings and Credit Association) model — widely known as "chit funds" or "committees" in South Asia. A group of members pool a fixed contribution amount monthly; each cycle, one member takes the full pot (by turn order or bidding) until everyone has received the pot once.
 
-**The problem with traditional ROSCAs:** they run on paper, WhatsApp, and blind trust. Organisers can disappear with the money, records are opaque, and there is no dispute resolution.
+**The traditional problem:** These funds run entirely on paper, WhatsApp, and blind trust. Organizers can disappear with the pool, turn order disputes are common, and late/non-payers disrupt the savings cycle.
 
-**RotaFi's solution:** the rotation logic lives inside a Stellar Soroban smart contract. Funds release deterministically — no human can block or redirect a payout. Every contribution and payout is recorded on-chain and verifiable by anyone.
-
----
-
-## Live Demo
-
-- **App:** [https://rotafi.vercel.app](https://rotafi.vercel.app) *(deploy link — update once deployed)*
-- **Demo video:** *(link to be added)*
-- **Contract address:** *(Stellar testnet contract ID — to be added post-deployment)*
+**RotaFi's solution:**
+* **Soroban Smart Contract**: Rotation rules live inside a stateful smart contract on the Stellar network. Payouts are released automatically and deterministically.
+* **Bidding Mode**: Members can submit discount bids to win the cycle pot earlier. Bidding discount savings are refunded back to other members as dividend rebates.
+* **Portable Credit Trust Score**: Your chit-fund repayment history is recorded on-chain, creating a portable credit score (300-900 rating) that lets you carry your financial credibility to other groups.
 
 ---
 
-## Features
+## Live Demo & Contracts
 
-| Feature | Status |
-|---|---|
-| Stellar keypair wallet (testnet) | ✅ |
-| Create & configure a savings committee | ✅ |
-| Join an existing public committee | ✅ |
-| Contribute XLM each cycle | ✅ |
-| Automatic payout to next member in rotation | ✅ |
-| On-chain activity log per committee | ✅ |
-| Explore public committees | ✅ |
-| Member dashboard | ✅ |
-| Mobile-responsive UI | ✅ |
-| Supabase persistence layer | ✅ |
-| Loading states & error handling | ✅ |
-| Analytics / monitoring | 🔧 In progress |
-| Real Soroban contract deployment | 🔧 In progress |
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────┐
-│                   React Frontend                     │
-│  (Vite + TypeScript + Tailwind CSS)                 │
-│                                                     │
-│  Pages: Landing · Explore · Dashboard · Detail      │
-│  Components: Header · WalletBar · CommitteeCard     │
-└───────────────────┬─────────────────────────────────┘
-                    │ REST / Realtime
-┌───────────────────▼─────────────────────────────────┐
-│               Supabase (Postgres)                    │
-│  Tables: committees · members · contributions        │
-│          payouts · activity_log                      │
-└───────────────────┬─────────────────────────────────┘
-                    │ stellar-sdk
-┌───────────────────▼─────────────────────────────────┐
-│           Stellar Testnet / Soroban                  │
-│  • Keypair generation (Stellar SDK)                  │
-│  • Deterministic rotation contract logic             │
-│  • XLM contributions & payouts                       │
-└─────────────────────────────────────────────────────┘
-```
-
-### Key Design Decisions
-
-- **Deterministic contract mirror:** The MVP runs the same rotation state machine on the Supabase-backed state that the Soroban contract enforces on-chain. This means the UI behaviour is faithful to what a deployed contract would do, and swapping to real on-chain calls is a single-layer change.
-- **No custodial wallet:** RotaFi never holds keys. The keypair is generated locally with `stellar-sdk`, stored in `localStorage`, and used to sign transactions client-side.
-- **Paise-denominated amounts:** All monetary values are stored in paise (1 INR = 100 paise) as integers to avoid floating-point errors — mirroring the integer-arithmetic pattern used in Soroban contracts.
+* **Frontend Web App**: *[Add your Vercel URL here after deploying]*
+* **Backend API server**: *[Add your Render/Railway backend URL here after deploying]*
+* **Demo Video**: *[Add your demo YouTube/Loom link here]*
+* **Stellar Testnet Contract Address**: `[Add your contract address after running deploy.sh]`
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend framework | React 18 + TypeScript |
-| Build tool | Vite 5 |
-| Styling | Tailwind CSS 3 |
-| Icons | Lucide React |
-| Blockchain SDK | stellar-sdk 13 |
-| Database / auth | Supabase (Postgres + Realtime) |
-| Deployment | Vercel (frontend) |
+| Layer | Technology | Description |
+|---|---|---|
+| **Frontend** | React 18 + TypeScript | SPA built using Vite |
+| **Styling** | Tailwind CSS 3 | Fully responsive for mobile and desktop screens |
+| **Wallet** | Freighter API v1.7.x | Stellar wallet connection and transaction signing |
+| **Backend API** | Node.js + Express | REST API server for user auth and committee indexing |
+| **Database** | MongoDB Atlas | Persists profiles, bids, anchor transactions, and logs |
+| **Smart Contracts** | Soroban Rust | Stateless ROSCA contract deployed on Stellar testnet |
 
 ---
 
-## Getting Started
+## Production Deployment & Environment Variables
 
-### Prerequisites
+RotaFi is structured as a hybrid app: a frontend SPA (Vite) and a backend API server (Express).
 
-- Node.js ≥ 18
-- npm ≥ 9
+### 1. Frontend Environment Variables (Vercel)
+Vercel hosts the static React client. Add these keys under Vercel Project Settings → Environment Variables:
 
-### Local development
+| Variable | Recommended Value | Description |
+|---|---|---|
+| `VITE_STELLAR_NETWORK` | `TESTNET` | Targets the Stellar Testnet network |
+| `VITE_CONTRACT_ID` | `Your_Contract_Address` | The contract ID from `deploy.sh` |
+| `VITE_API_URL` | `https://your-backend.onrender.com/api` | **Must point to your deployed backend API URL** |
+
+### 2. Backend Environment Variables (Render / Heroku)
+Render hosts the Express backend API. Configure these environment variables in your backend service dashboard:
+
+| Variable | Recommended Value | Description |
+|---|---|---|
+| `MONGODB_URI` | `mongodb+srv://RotaFI:ROTAFI_9009@cluster0.uinxbmz.mongodb.net/?appName=Cluster0` | Connection string for MongoDB Atlas database |
+| `JWT_SECRET` | `A-secure-random-secret-key` | Secret key used to sign and verify user JWT sessions |
+| `PORT` | `3001` | The port the backend listens on (Render sets this dynamically) |
+
+---
+
+## Local Development Setup
+
+To run the full client and server locally in parallel:
 
 ```bash
-# 1. Clone the repo
+# 1. Clone the repository
 git clone https://github.com/Sov-ereign/RotaFI.git
 cd RotaFI
 
 # 2. Install dependencies
 npm install
 
-# 3. Configure environment
+# 3. Set up local configuration
 cp .env.example .env
-# Fill in your Supabase URL and anon key
+# Ensure MONGODB_URI, JWT_SECRET, and VITE_API_URL are set correctly.
 
-# 4. Start the dev server
+# 4. Start both frontend and backend concurrently
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`.
-
-### Environment Variables
-
-| Variable | Description |
-|---|---|
-| `VITE_SUPABASE_URL` | Your Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase anon (public) API key |
-
-### Database Setup
-
-Run the SQL migrations in `supabase/` against your Supabase project. The schema creates the following tables:
-
-- `committees` — group metadata, cycle settings, status
-- `members` — participant records linked to committees
-- `contributions` — per-cycle contribution records
-- `payouts` — payout events per cycle
-- `activity_log` — timestamped event log
+* **Vite Frontend**: `http://localhost:5173`
+* **Express Backend**: `http://localhost:3001`
 
 ---
 
-## Project Structure
+## Architecture & Data Flow
 
 ```
-src/
-├── components/          # Shared UI components
-│   ├── Header.tsx
-│   ├── Logo.tsx
-│   ├── WalletBar.tsx
-│   ├── CommitteeCard.tsx
-│   ├── Modal.tsx
-│   ├── Toaster.tsx
-│   └── ...
-├── context/
-│   └── AppContext.tsx    # Global state & navigation
-├── lib/
-│   ├── contract.ts       # Rotation logic (mirrors Soroban contract)
-│   ├── wallet.ts         # Stellar keypair helpers
-│   ├── supabase.ts       # Supabase client
-│   └── types.ts          # Shared TypeScript types
-├── pages/
-│   ├── LandingPage.tsx
-│   ├── ExplorePage.tsx
-│   ├── DashboardPage.tsx
-│   ├── CreateCommitteePage.tsx
-│   └── CommitteeDetailPage.tsx
-└── index.css             # Global styles & design tokens
+┌────────────────────────┐         REST / JWT          ┌────────────────────────┐
+│     React Frontend     │ <─────────────────────────> │   Node/Express API     │
+│  (Vite + Freighter)    │                             │  (MongoDB Atlas)       │
+└───────────┬────────────┘                             └───────────┬────────────┘
+            │                                                      │
+            │ signs transaction                                    │ indexes states
+┌───────────▼────────────┐                                         │ & credit scores
+│    Stellar Testnet     │ <───────────────────────────────────────┘
+│  (Soroban Contract)    │
+└────────────────────────┘
 ```
 
----
-
-## Smart Contract
-
-The rotation logic is modelled as a deterministic state machine. In the MVP, this runs client-side and mirrors the Soroban contract methods:
-
-- `create_committee(params)` — initialise a new savings group
-- `join_committee(committee_id, member_public_key)` — register as a member
-- `contribute(committee_id, cycle_index)` — pay into the current cycle pool
-- `trigger_payout(committee_id, cycle_index)` — release the pooled funds to the current beneficiary
-
-**Contract deployment:** Targeted for Stellar testnet. Address will be published here once deployed.
+1. **User Sign Up & Auth**: Users register with email and password. Sessions are securely managed via JWT tokens and local storage.
+2. **Freighter Linking**: Users link their Freighter wallet directly from their profile. The wallet address is bound to their MongoDB profile.
+3. **Committees & Bids**: Active bidding groups allow members to place bids. The highest discount wins the pot.
+4. **Credit Score**: The system monitors transactions: on-time payments boost scores (+15), while defaults deduct points (-100), simulating a portable credit bureau.
+5. **Simulated Anchors**: Users can deposit/withdraw mock INR assets through UPI, converting INR to XLM via simulated anchor rails.
 
 ---
 
-## Screenshots
+## Smart Contract Commands
 
-*(Add screenshots here — see submission checklist)*
+The contract source files are located in `/contracts`.
 
-- Product UI
-- Mobile responsive view
-- Analytics / monitoring dashboard
+```bash
+# Compile contracts to WASM targets
+stellar contract build
 
----
-
-## Roadmap
-
-- [ ] Deploy Soroban contract to Stellar testnet
-- [ ] Replace mock tx hashes with real Stellar transaction IDs
-- [ ] Add Freighter wallet support
-- [ ] Integrate analytics (PostHog or Plausible)
-- [ ] Add monitoring (Sentry)
-- [ ] Multi-currency support (USDC on Stellar)
-- [ ] Bidding mode for chit fund payout order
-
----
-
-## Contributing
-
-Pull requests are welcome. Please open an issue first to discuss significant changes.
-
----
-
-## License
-
-MIT © 2025 RotaFi
+# Deploy WASM target to testnet (requires stellar-cli)
+bash contracts/deploy.sh
+```
 
 ---
 
