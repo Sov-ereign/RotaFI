@@ -16,7 +16,7 @@ export function DashboardPage() {
   useEffect(() => {
     if (!identity) return;
     setLoading(true);
-    fetchMyCommittees(identity.publicKey)
+    fetchMyCommittees(identity.publicKey ?? identity.email)
       .then(async (cs) => {
         setCommittees(cs);
         const entries = await Promise.all(
@@ -30,8 +30,8 @@ export function DashboardPage() {
   if (!identity) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <h2 className="font-display text-2xl font-bold text-ink-900">Connect your wallet</h2>
-        <p className="mt-2 text-ink-600">Create a wallet identity to view your committees.</p>
+        <h2 className="font-display text-2xl font-bold text-ink-900">Sign in to view your dashboard</h2>
+        <p className="mt-2 text-ink-600">Create an account or sign in to manage your committees.</p>
       </div>
     );
   }
@@ -39,8 +39,9 @@ export function DashboardPage() {
   const active = committees.filter((c) => c.status === 'active');
   const forming = committees.filter((c) => c.status === 'forming');
   const completed = committees.filter((c) => c.status === 'completed');
-  const organized = committees.filter((c) => c.organizer_wallet === identity.publicKey);
+  const organized = committees.filter((c) => identity.publicKey && c.organizer_wallet === identity.publicKey);
   const totalContributed = committees.reduce((s, c) => s + c.contribution_amount * c.current_cycle, 0);
+  const seed = identity.publicKey || identity.email;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -52,13 +53,15 @@ export function DashboardPage() {
             <div className="flex items-center gap-3">
               <span
                 className="grid h-12 w-12 place-items-center rounded-xl text-base font-bold text-white shadow-soft"
-                style={{ background: avatarGradient(identity.publicKey) }}
+                style={{ background: avatarGradient(seed) }}
               >
                 {initials(identity.name)}
               </span>
               <div className="min-w-0">
                 <div className="font-display text-lg font-bold text-ink-900">{identity.name}</div>
-                <div className="font-mono text-xs text-ink-400">{shortAddress(identity.publicKey, 8, 6)}</div>
+                <div className="font-mono text-xs text-ink-400">
+                  {identity.publicKey ? shortAddress(identity.publicKey, 8, 6) : identity.email}
+                </div>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs font-medium text-ink-400">

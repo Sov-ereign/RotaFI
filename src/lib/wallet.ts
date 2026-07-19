@@ -70,19 +70,22 @@ export async function signTx(xdr: string, network = 'TESTNET'): Promise<string> 
 
 // ── Address display helpers ────────────────────────────────────────────────────
 
-export function shortAddress(pk: string, head = 6, tail = 5): string {
-  if (!pk || pk.length < head + tail) return pk;
+export function shortAddress(pk: string | null | undefined, head = 6, tail = 5): string {
+  if (!pk) return '—';
+  if (pk.length < head + tail) return pk;
   return `${pk.slice(0, head)}…${pk.slice(-tail)}`;
 }
 
-export function avatarGradient(seed: string): string {
+export function avatarGradient(seed: string | null | undefined): string {
+  if (!seed) return 'linear-gradient(135deg, hsl(220 70% 62%), hsl(268 72% 52%))';
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 360;
   const h2 = (h + 48) % 360;
   return `linear-gradient(135deg, hsl(${h} 70% 62%), hsl(${h2} 72% 52%))`;
 }
 
-export function initials(name: string): string {
+export function initials(name: string | null | undefined): string {
+  if (!name) return '?';
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
