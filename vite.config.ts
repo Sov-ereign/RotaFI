@@ -14,7 +14,6 @@ export default defineConfig({
         manualChunks: {
           'stellar-vendor': ['stellar-sdk'],
           'react-vendor': ['react', 'react-dom'],
-          'supabase-vendor': ['@supabase/supabase-js'],
         },
       },
     },
