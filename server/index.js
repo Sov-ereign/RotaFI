@@ -14,8 +14,22 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ── Middleware ────────────────────────────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://rota-fi-omega.vercel.app',
+  'https://rotafi.vercel.app'
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:4173'],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 app.use(express.json({ limit: '2mb' }));
