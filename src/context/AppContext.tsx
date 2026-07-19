@@ -1,6 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { Identity } from '../lib/types';
-import { clearIdentity, createIdentity, loadIdentity } from '../lib/wallet';
+import {
+  connectFreighter,
+  isFreighterInstalled,
+  isFreighterAllowed,
+  loadIdentity,
+  saveDisplayName,
+} from '../lib/wallet';
 
 export type Route =
   | { name: 'landing' }
@@ -19,8 +25,10 @@ interface ToastMessage {
 interface AppContextValue {
   identity: Identity | null;
   ready: boolean;
+  freighterInstalled: boolean;
   // identity actions
-  register: (name: string) => Promise<void>;
+  connect: () => Promise<void>;
+  setDisplayName: (name: string) => void;
   signOut: () => void;
   // routing
   route: Route;
@@ -57,12 +65,25 @@ function routeToHash(route: Route): string {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [ready, setReady] = useState(false);
+  const [freighterInstalled, setFreighterInstalled] = useState(false);
   const [route, setRoute] = useState<Route>(() => parseHash());
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
+  // On mount: check Freighter and restore session
   useEffect(() => {
-    setIdentity(loadIdentity());
-    setReady(true);
+    (async () => {
+      const installed = await isFreighterInstalled();
+      setFreighterInstalled(installed);
+
+      if (installed) {
+        const allowed = await isFreighterAllowed();
+        if (allowed) {
+          const id = await loadIdentity();
+          if (id) setIdentity(id);
+        }
+      }
+      setReady(true);
+    })();
   }, []);
 
   useEffect(() => {
@@ -81,13 +102,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
 
-  const register = useCallback(async (name: string) => {
-    const id = await createIdentity(name);
+  const connect = useCallback(async () => {
+    const id = await connectFreighter();
     setIdentity(id);
   }, []);
 
+  const setDisplayName = useCallback((name: string) => {
+    if (!identity) return;
+    saveDisplayName(identity.publicKey, name);
+    setIdentity((prev) => prev ? { ...prev, name } : prev);
+  }, [identity]);
+
   const signOut = useCallback(() => {
-    clearIdentity();
     setIdentity(null);
     navigate({ name: 'landing' });
   }, [navigate]);
@@ -103,8 +129,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<AppContextValue>(
-    () => ({ identity, ready, register, signOut, route, navigate, toasts, toast, dismissToast }),
-    [identity, ready, register, signOut, route, navigate, toasts, toast, dismissToast],
+    () => ({ identity, ready, freighterInstalled, connect, setDisplayName, signOut, route, navigate, toasts, toast, dismissToast }),
+    [identity, ready, freighterInstalled, connect, setDisplayName, signOut, route, navigate, toasts, toast, dismissToast],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

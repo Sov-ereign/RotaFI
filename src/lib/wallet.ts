@@ -1,52 +1,134 @@
+// Freighter wallet integration for RotaFi.
+// Replaces the old keypair-based system — Freighter owns the private key and
+// signs all transactions. We only store the display name locally.
+
 import type { Identity } from './types';
 
-const STORAGE_KEY = 'rotafi.identity.v1';
+const NAME_KEY = 'rotafi.display_names.v2';
 
-// Load/persist/clear the local identity. These never touch stellar-sdk, so the
-// heavy crypto dependency is only dynamically imported in createIdentity().
-export function loadIdentity(): Identity | null {
+// ── Freighter detection ──────────────────────────────────────────────────────
+
+export async function isFreighterInstalled(): Promise<boolean> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Identity;
-    if (!parsed.publicKey || !parsed.secretKey || !parsed.name) return null;
-    return parsed;
+    // @stellar/freighter-api injects window.freighter
+    const { isConnected } = await import('@stellar/freighter-api');
+    const result = await isConnected();
+    return result.isConnected;
+  } catch {
+    return false;
+  }
+}
+
+export async function isFreighterAllowed(): Promise<boolean> {
+  try {
+    const { isAllowed } = await import('@stellar/freighter-api');
+    const result = await isAllowed();
+    return result.isAllowed;
+  } catch {
+    return false;
+  }
+}
+
+// ── Connection ───────────────────────────────────────────────────────────────
+
+/** Request Freighter access and return an Identity (no secret key stored). */
+export async function connectFreighter(): Promise<Identity> {
+  const { requestAccess, getNetwork } = await import('@stellar/freighter-api');
+
+  const accessResult = await requestAccess();
+  if ('error' in accessResult && accessResult.error) {
+    throw new Error(accessResult.error);
+  }
+
+  const address = (accessResult as { address: string }).address;
+  if (!address) throw new Error('Freighter did not return an address.');
+
+  const networkResult = await getNetwork();
+  const network = 'networkPassphrase' in networkResult
+    ? networkResult.network ?? 'TESTNET'
+    : 'TESTNET';
+
+  const name = loadDisplayName(address) || shortAddress(address);
+
+  const identity: Identity = {
+    name,
+    publicKey: address,
+    network,
+    createdAt: new Date().toISOString(),
+  };
+  return identity;
+}
+
+/** Get the currently connected Freighter address without requesting access. */
+export async function getConnectedAddress(): Promise<string | null> {
+  try {
+    const { getAddress } = await import('@stellar/freighter-api');
+    const result = await getAddress();
+    if ('error' in result) return null;
+    return (result as { address: string }).address || null;
   } catch {
     return null;
   }
 }
 
-export function saveIdentity(identity: Identity): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
+/** Restore a previously connected identity from Freighter (non-interactive). */
+export async function loadIdentity(): Promise<Identity | null> {
+  try {
+    const address = await getConnectedAddress();
+    if (!address) return null;
+    const name = loadDisplayName(address) || shortAddress(address);
+    return { name, publicKey: address, network: 'TESTNET', createdAt: '' };
+  } catch {
+    return null;
+  }
 }
 
-export function clearIdentity(): void {
-  localStorage.removeItem(STORAGE_KEY);
+// ── Signing ──────────────────────────────────────────────────────────────────
+
+/** Sign a Stellar transaction XDR with Freighter. Returns signed XDR. */
+export async function signTx(
+  xdr: string,
+  network: string = 'TESTNET',
+): Promise<string> {
+  const { signTransaction } = await import('@stellar/freighter-api');
+  const result = await signTransaction(xdr, {
+    network,
+    networkPassphrase: network === 'TESTNET'
+      ? 'Test SDF Network ; September 2015'
+      : 'Public Global Stellar Network ; September 2015',
+  });
+  if ('error' in result && result.error) throw new Error(result.error as string);
+  return (result as { signedTxXdr: string }).signedTxXdr;
 }
 
-// Generate a fresh Stellar testnet keypair. stellar-sdk is dynamically imported
-// here so the ~940 kB crypto library only loads when a wallet is actually being
-// created — the landing page never pays that cost.
-export async function createIdentity(name: string): Promise<Identity> {
-  const { Keypair } = await import('stellar-sdk');
-  const kp = Keypair.random();
-  const identity: Identity = {
-    name: name.trim().slice(0, 40) || 'Member',
-    publicKey: kp.publicKey(),
-    secretKey: kp.secret(),
-    createdAt: new Date().toISOString(),
-  };
-  saveIdentity(identity);
-  return identity;
+// ── Display name management ───────────────────────────────────────────────────
+
+export function saveDisplayName(publicKey: string, name: string): void {
+  const map = _loadNameMap();
+  map[publicKey] = name.trim().slice(0, 40) || shortAddress(publicKey);
+  localStorage.setItem(NAME_KEY, JSON.stringify(map));
 }
 
-// Short, human-friendly display of a public key: GABC...XYZ
+export function loadDisplayName(publicKey: string): string | null {
+  return _loadNameMap()[publicKey] || null;
+}
+
+function _loadNameMap(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(NAME_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+// ── Address helpers ───────────────────────────────────────────────────────────
+
 export function shortAddress(pk: string, head = 6, tail = 5): string {
   if (!pk || pk.length < head + tail) return pk;
   return `${pk.slice(0, head)}…${pk.slice(-tail)}`;
 }
 
-// Deterministic, soft pastel avatar gradient from a public key.
+/** Deterministic avatar gradient from a public key. */
 export function avatarGradient(pk: string): string {
   let h = 0;
   for (let i = 0; i < pk.length; i++) h = (h * 31 + pk.charCodeAt(i)) % 360;
@@ -54,7 +136,7 @@ export function avatarGradient(pk: string): string {
   return `linear-gradient(135deg, hsl(${h} 70% 62%), hsl(${h2} 72% 52%))`;
 }
 
-// First letter(s) of a name for avatar fallback.
+/** First letter(s) of a name for avatar fallback. */
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';

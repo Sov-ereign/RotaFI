@@ -1,3 +1,4 @@
+
 # RotaFi — Transparent Rotating Savings on Stellar
 
 > Trustless rotating savings groups (ROSCAs / chit funds) powered by Stellar Soroban smart contracts. Transparent cycles, on-chain history — no organizer can run off with the pool.

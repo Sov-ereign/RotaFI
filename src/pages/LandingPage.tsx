@@ -246,7 +246,9 @@ function StellarRationale() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-400">Why Stellar</p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Not payments bolted onto a chain — the structural fix
+            Not payments
+
+            ed onto a chain — the structural fix
           </h2>
           <p className="mt-4 text-pretty text-ink-300">
             The trust and transparency problem chit funds have is structurally the problem smart

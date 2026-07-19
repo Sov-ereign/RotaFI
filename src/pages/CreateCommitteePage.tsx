@@ -4,10 +4,10 @@ import {
   Sparkles, Loader2, ListOrdered, Gavel, Info,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { createCommittee, formatINR, rupeesFromPaise } from '../lib/contract';
+import { createCommittee, formatXLM } from '../lib/contract';
 import type { PenaltyStrategy, PayoutRule } from '../lib/types';
 
-const PRESET_AMOUNTS = [500, 1000, 2000, 5000];
+const PRESET_AMOUNTS = [1, 5, 10, 25]; // XLM
 const PRESET_MEMBERS = [5, 10, 12, 20];
 const PRESET_CYCLES = [30, 60, 90];
 
@@ -18,12 +18,12 @@ export function CreateCommitteePage() {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState(2000);
+  const [amount, setAmount] = useState(5); // XLM
   const [cycleDays, setCycleDays] = useState(30);
   const [memberCount, setMemberCount] = useState(10);
   const [payoutRule, setPayoutRule] = useState<PayoutRule>('turn_order');
   const [penaltyStrategy, setPenaltyStrategy] = useState<PenaltyStrategy>('delay');
-  const [penaltyAmount, setPenaltyAmount] = useState(100);
+  const [penaltyAmount, setPenaltyAmount] = useState(0.5); // XLM
 
   if (!identity) {
     return (
@@ -35,7 +35,7 @@ export function CreateCommitteePage() {
   }
 
   const steps = ['Basics', 'Contributions', 'Rules', 'Review'];
-  const potRupees = amount * memberCount;
+  const potXLM = amount * memberCount;
 
   const canNext = () => {
     if (step === 0) return name.trim().length >= 2;
@@ -115,10 +115,10 @@ export function CreateCommitteePage() {
         {step === 1 && (
           <div className="animate-fade-in space-y-6">
             <div>
-              <label className="label flex items-center gap-1.5"><Coins className="h-4 w-4 text-brand-500" /> Monthly contribution (₹)</label>
+              <label className="label flex items-center gap-1.5"><Coins className="h-4 w-4 text-brand-500" /> Contribution per cycle (XLM)</label>
               <div className="flex flex-wrap gap-2">
                 {PRESET_AMOUNTS.map((a) => (
-                  <PresetChip key={a} active={amount === a} onClick={() => setAmount(a)}>₹{a}</PresetChip>
+                  <PresetChip key={a} active={amount === a} onClick={() => setAmount(a)}>{a} XLM</PresetChip>
                 ))}
               </div>
               <div className="mt-2 flex items-center gap-2">
@@ -151,9 +151,9 @@ export function CreateCommitteePage() {
             <div className="rounded-xl bg-gradient-to-br from-brand-50 to-sapphire-50 p-4 ring-1 ring-brand-100">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-ink-600">Pot per cycle</span>
-                <span className="font-display text-2xl font-extrabold text-ink-900">{formatINR(potRupees * 100)}</span>
+                <span className="font-display text-2xl font-extrabold text-ink-900">{formatXLM(potXLM)}</span>
               </div>
-              <p className="mt-1 text-[11px] text-ink-500">{formatINR(amount * 100)} × {memberCount} members</p>
+              <p className="mt-1 text-[11px] text-ink-500">{formatXLM(amount)} × {memberCount} members</p>
             </div>
           </div>
         )}
@@ -211,7 +211,7 @@ export function CreateCommitteePage() {
 
             {penaltyStrategy === 'penalty' && (
               <div>
-                <label className="label">Penalty amount (₹)</label>
+                <label className="label">Penalty amount (XLM)</label>
                 <input type="number" min={0} className="input" value={penaltyAmount} onChange={(e) => setPenaltyAmount(Math.max(0, Number(e.target.value)))} />
               </div>
             )}
@@ -231,13 +231,13 @@ export function CreateCommitteePage() {
             </div>
             <ReviewRow label="Name" value={name} />
             {description && <ReviewRow label="Description" value={description} />}
-            <ReviewRow label="Contribution" value={`${formatINR(amount * 100)} / cycle`} />
+            <ReviewRow label="Contribution" value={`${formatXLM(amount)} / cycle`} />
             <ReviewRow label="Members" value={`${memberCount} members · ${memberCount} cycles`} />
             <ReviewRow label="Cycle length" value={`${cycleDays} days`} />
             <ReviewRow label="Payout rule" value={payoutRule === 'turn_order' ? 'Turn order' : 'Bidding (v2)'} />
             <ReviewRow label="Default handling" value={penaltyStrategy.replace('_', ' ')} />
-            {penaltyStrategy === 'penalty' && <ReviewRow label="Penalty" value={formatINR(penaltyAmount * 100)} />}
-            <ReviewRow label="Pot per cycle" value={formatINR(potRupees * 100)} highlight />
+            {penaltyStrategy === 'penalty' && <ReviewRow label="Penalty" value={formatXLM(penaltyAmount)} />}
+            <ReviewRow label="Pot per cycle" value={formatXLM(potXLM)} highlight />
             <ReviewRow label="Organizer" value={`${identity.name} (you)`} />
           </div>
         )}
@@ -309,4 +309,4 @@ function ReviewRow({ label, value, highlight }: { label: string; value: string; 
   );
 }
 
-export { rupeesFromPaise };
+

@@ -1,4 +1,8 @@
 // Shared domain types for the RotaFi platform.
+// Amounts are in XLM (as JavaScript number, e.g. 5.0 = 5 XLM).
+// When interacting with Soroban, multiply by STROOPS_PER_XLM.
+
+export const STROOPS_PER_XLM = 10_000_000;
 
 export type PayoutRule = 'turn_order' | 'bidding';
 export type CommitteeStatus = 'forming' | 'active' | 'completed' | 'cancelled';
@@ -10,7 +14,8 @@ export interface Committee {
   id: string;
   name: string;
   description: string | null;
-  contribution_amount: number; // paise
+  /** Contribution amount in XLM (e.g. 5.0 = 5 XLM) */
+  contribution_amount: number;
   cycle_length_days: number;
   member_count: number;
   payout_rule: PayoutRule;
@@ -18,10 +23,8 @@ export interface Committee {
   organizer_name: string;
   current_cycle: number;
   status: CommitteeStatus;
-  asset_code: string;
-  asset_issuer: string | null;
   penalty_strategy: PenaltyStrategy;
-  penalty_amount: number; // paise
+  penalty_amount: number; // XLM
   started_at: string | null;
   completed_at: string | null;
   created_at: string;
@@ -42,7 +45,8 @@ export interface Contribution {
   committee_id: string;
   member_id: string;
   cycle_index: number;
-  amount: number; // paise
+  /** Amount in XLM */
+  amount: number;
   status: ContributionStatus;
   tx_hash: string | null;
   paid_at: string | null;
@@ -54,7 +58,8 @@ export interface Payout {
   committee_id: string;
   cycle_index: number;
   recipient_member_id: string;
-  amount: number; // paise
+  /** Amount in XLM */
+  amount: number;
   status: PayoutStatus;
   tx_hash: string | null;
   released_at: string | null;
@@ -96,6 +101,7 @@ export interface CommitteeDetail extends Committee {
 export interface Identity {
   name: string;
   publicKey: string;
-  secretKey: string;
+  /** Network the wallet is connected to */
+  network: string;
   createdAt: string;
 }
