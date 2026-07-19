@@ -157,7 +157,15 @@ export function WalletBar() {
       toast({ kind: 'success', title: 'Freighter linked!', description: 'Your Stellar wallet is now connected.' });
       setMenuOpen(false);
     } catch (e) {
-      toast({ kind: 'error', title: 'Link failed', description: e instanceof Error ? e.message : 'Could not connect Freighter.' });
+      const msg = e instanceof Error ? e.message : '';
+      const isNotInstalled = !msg || msg.toLowerCase().includes('freighter') === false;
+      toast({
+        kind: 'error',
+        title: isNotInstalled ? 'Freighter not found' : 'Link failed',
+        description: isNotInstalled
+          ? `Install the Freighter extension at freighter.app, then try again. (Error: ${msg || 'Unknown'})`
+          : msg,
+      });
     } finally {
       setLinkingWallet(false);
     }
@@ -239,34 +247,22 @@ export function WalletBar() {
 
               {/* Freighter link/unlink */}
               {!identity.publicKey ? (
-                !freighterChecking && !freighterInstalled ? (
-                  <a href="https://www.freighter.app/" target="_blank" rel="noopener noreferrer"
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-amber-700 transition hover:bg-amber-50"
-                    onClick={() => setMenuOpen(false)}>
-                    <AlertCircle className="h-4 w-4" />
-                    Install Freighter
-                    <ExternalLink className="ml-auto h-3.5 w-3.5 opacity-60" />
-                  </a>
-                ) : (
-                  <button
-                    onClick={handleLinkWallet}
-                    disabled={linkingWallet || freighterChecking}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-brand-700 transition hover:bg-brand-50 disabled:opacity-50"
-                  >
-                    {linkingWallet
-                      ? <><Loader2 className="h-4 w-4 animate-spin" /> Connecting…</>
-                      : <><Edit2 className="h-4 w-4 text-brand-400" /> Link Freighter wallet</>}
-                  </button>
-                )
+                <button
+                  onClick={handleLinkWallet}
+                  disabled={linkingWallet}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-brand-700 transition hover:bg-brand-50 disabled:opacity-50"
+                >
+                  {linkingWallet
+                    ? <><Loader2 className="h-4 w-4 animate-spin" /> Connecting…</>
+                    : <><Edit2 className="h-4 w-4 text-brand-400" /> Link Freighter wallet</>}
+                </button>
               ) : (
-                identity.publicKey && (
-                  <a href={`https://stellar.expert/explorer/testnet/account/${identity.publicKey}`}
-                    target="_blank" rel="noopener noreferrer"
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50"
-                    onClick={() => setMenuOpen(false)}>
-                    <ExternalLink className="h-4 w-4 text-ink-400" /> View on Explorer
-                  </a>
-                )
+                <a href={`https://stellar.expert/explorer/testnet/account/${identity.publicKey}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-ink-700 transition hover:bg-ink-50"
+                  onClick={() => setMenuOpen(false)}>
+                  <ExternalLink className="h-4 w-4 text-ink-400" /> View on Explorer
+                </a>
               )}
 
               <div className="my-1 h-px bg-ink-100" />

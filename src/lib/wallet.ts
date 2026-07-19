@@ -30,23 +30,36 @@ export function isFreighterSync(): boolean {
 
 /** Request access from Freighter and return the public key. */
 export async function connectFreighter(): Promise<string> {
-  const { requestAccess } = await import('@stellar/freighter-api');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result = await (requestAccess as () => Promise<any>)();
-  const address: string | undefined = result?.address ?? result;
-  if (!address || typeof address !== 'string')
-    throw new Error(result?.error || 'Freighter did not return an address');
-  return address;
+  try {
+    const { getPublicKey } = await import('@stellar/freighter-api');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (getPublicKey as () => Promise<any>)();
+
+    // v1.x returns the public key as a plain string on success,
+    // OR an error string like "Freighter is not installed." on failure.
+    const str: string =
+      typeof result === 'string' ? result : (result?.address ?? result?.error ?? '');
+
+    // Valid Stellar public keys start with 'G' and are exactly 56 chars
+    if (str && str.startsWith('G') && str.length === 56) return str;
+
+    // Any other string is an error message from the extension
+    throw new Error(str || 'Freighter did not return a public key');
+  } catch (e) {
+    if (e instanceof Error) throw e;
+    throw new Error('Failed to connect Freighter wallet');
+  }
 }
 
 /** Get currently active Freighter address without requesting access. */
 export async function getFreighterAddress(): Promise<string | null> {
   try {
-    const { getAddress } = await import('@stellar/freighter-api');
+    const { getPublicKey } = await import('@stellar/freighter-api');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await (getAddress as () => Promise<any>)();
-    const address: string | undefined = result?.address ?? result;
-    return typeof address === 'string' && address ? address : null;
+    const result = await (getPublicKey as () => Promise<any>)();
+    const str: string =
+      typeof result === 'string' ? result : (result?.address ?? '');
+    return (str && str.startsWith('G') && str.length === 56) ? str : null;
   } catch {
     return null;
   }
