@@ -1,6 +1,6 @@
 # RotaFi — Transparent Rotating Savings on Stellar
 
-> Trustless rotating savings groups (ROSCAs / chit funds) powered by Stellar Soroban smart contracts. Transparent cycles, on-chain history, and portable credit trust scores — no organizer can run off with the pool.
+> Trustless rotating savings groups (ROSCAs / chit funds) powered by Stellar Soroban smart contracts. Transparent cycle management, on-chain history, bidding auctions, and portable credit trust scores — ensuring no organizer can run off with the pool.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Network: Stellar Testnet](https://img.shields.io/badge/Network-Stellar%20Testnet-purple)](https://stellar.org)
@@ -8,68 +8,69 @@
 
 ---
 
-## What is RotaFi?
+## 🌟 What is RotaFi?
 
-RotaFi digitizes the traditional ROSCA (Rotating Savings and Credit Association) model — widely known as "chit funds" or "committees" in South Asia. A group of members pool a fixed contribution amount monthly; each cycle, one member takes the full pot (by turn order or bidding) until everyone has received the pot once.
+RotaFi digitizes the traditional ROSCA (Rotating Savings and Credit Association) model — widely known as "chit funds" or "committees" across South Asia. A group of members pool a fixed monthly contribution; each cycle, one member receives the full pot (by turn order or bidding auction) until everyone has received the pot once.
 
-**The traditional problem:** These funds run entirely on paper, WhatsApp, and blind trust. Organizers can disappear with the pool, turn order disputes are common, and late/non-payers disrupt the savings cycle.
+### The Problem with Traditional Committees
+Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed organizers can disappear with the pool, disputes over turn order are common, and late/non-payers disrupt savings. Furthermore, participants build zero verifiable credit history.
 
-**RotaFi's solution:**
-* **Soroban Smart Contract**: Rotation rules live inside a stateful smart contract on the Stellar network. Payouts are released automatically and deterministically.
-* **Bidding Mode**: Members can submit discount bids to win the cycle pot earlier. Bidding discount savings are refunded back to other members as dividend rebates.
-* **Portable Credit Trust Score**: Your chit-fund repayment history is recorded on-chain, creating a portable credit score (300-900 rating) that lets you carry your financial credibility to other groups.
-
----
-
-## Live Demo & Contracts
-
-* **Frontend Web App**: *[Add your Vercel URL here after deploying]*
-* **Backend API server**: *[Add your Render/Railway backend URL here after deploying]*
-* **Demo Video**: *[Add your demo YouTube/Loom link here]*
-* **Stellar Testnet Contract Address**: `[Add your contract address after running deploy.sh]`
+### The RotaFi Solution
+* **Soroban Smart Contract**: Rotation logic, contribution checks, and pot distribution are governed by a deterministic smart contract on Stellar Testnet. Funds cannot be withheld or misdirected by any organizer.
+* **Bidding Mode (ROSCA Auction)**: Members can submit discount bids to receive the pot early. Bidding discount savings are redistributed back to all other members as savings dividend rebates.
+* **Reputation Credit Score (300–900 Rating)**: On-chain repayment history generates a portable credit score. On-time contributions (+15), bidding wins (+30), and fiat deposits (+10) boost your score, while defaults (-100) penalize reputation.
+* **Simulated Stellar Fiat Anchor (INR ↔ XLM)**: Users can deposit and withdraw Indian Rupees (INR) via simulated UPI bank rails at an exchange rate of ₹10 = 1 XLM.
 
 ---
 
-## Tech Stack
+## 🔗 Live Deployments & Contracts
 
-| Layer | Technology | Description |
+* **Frontend Web App**: [https://rota-fi-omega.vercel.app](https://rota-fi-omega.vercel.app)
+* **Backend API Server**: [https://rotafi-hw2t.onrender.com/api](https://rotafi-hw2t.onrender.com/api)
+* **Stellar Testnet Contract ID**: [`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`](https://lab.stellar.org/r/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
+* **Stellar Expert Explorer**: [View Contract on Explorer](https://stellar.expert/explorer/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Purpose |
 |---|---|---|
-| **Frontend** | React 18 + TypeScript | SPA built using Vite |
-| **Styling** | Tailwind CSS 3 | Fully responsive for mobile and desktop screens |
-| **Wallet** | Freighter API v1.7.x | Stellar wallet connection and transaction signing |
-| **Backend API** | Node.js + Express | REST API server for user auth and committee indexing |
-| **Database** | MongoDB Atlas | Persists profiles, bids, anchor transactions, and logs |
-| **Smart Contracts** | Soroban Rust | Stateless ROSCA contract deployed on Stellar testnet |
+| **Frontend** | React 18 + TypeScript | SPA built using Vite 5 |
+| **Styling** | Tailwind CSS 3 | Fully responsive UI with micro-animations & dark accents |
+| **Wallet** | Freighter API v1.7.x | Browser extension wallet connection & transaction signing |
+| **Backend API** | Node.js + Express | REST API server for user authentication & indexing |
+| **Database** | MongoDB Atlas | Stores user profiles, bids, anchor transfers, & activity logs |
+| **Smart Contracts** | Soroban Rust | Stateful ROSCA contract on Stellar Testnet |
+| **Monitoring** | Sentry SDK + Vercel Analytics | Client-side error tracking & performance telemetry |
 
 ---
 
-## Production Deployment & Environment Variables
+## ⚙️ Environment Variables Setup
 
-RotaFi is structured as a hybrid app: a frontend SPA (Vite) and a backend API server (Express).
+RotaFi consists of a React client (Vercel) and an Express backend API (Render).
 
-### 1. Frontend Environment Variables (Vercel)
-Vercel hosts the static React client. Add these keys under Vercel Project Settings → Environment Variables:
+### 1. Frontend Environment Variables (Vercel Settings)
 
-| Variable | Recommended Value | Description |
+| Variable | Value | Purpose |
 |---|---|---|
-| `VITE_STELLAR_NETWORK` | `TESTNET` | Targets the Stellar Testnet network |
-| `VITE_CONTRACT_ID` | `Your_Contract_Address` | The contract ID from `deploy.sh` |
-| `VITE_API_URL` | `https://your-backend.onrender.com/api` | **Must point to your deployed backend API URL** |
+| `VITE_STELLAR_NETWORK` | `TESTNET` | Targets Stellar Testnet network |
+| `VITE_CONTRACT_ID` | `CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D` | Deployed Soroban contract address |
+| `VITE_API_URL` | `https://rotafi-hw2t.onrender.com/api` | Live backend REST API URL |
 
-### 2. Backend Environment Variables (Render / Heroku)
-Render hosts the Express backend API. Configure these environment variables in your backend service dashboard:
+### 2. Backend Environment Variables (Render Settings)
 
-| Variable | Recommended Value | Description |
+| Variable | Value | Purpose |
 |---|---|---|
-| `MONGODB_URI` | `mongodb+srv://RotaFI:ROTAFI_9009@cluster0.uinxbmz.mongodb.net/?appName=Cluster0` | Connection string for MongoDB Atlas database |
-| `JWT_SECRET` | `A-secure-random-secret-key` | Secret key used to sign and verify user JWT sessions |
-| `PORT` | `3001` | The port the backend listens on (Render sets this dynamically) |
+| `MONGODB_URI` | `mongodb+srv://RotaFI:ROTAFI_9009@cluster0.uinxbmz.mongodb.net/?appName=Cluster0` | MongoDB Atlas cluster connection string |
+| `JWT_SECRET` | `rotafi-jwt-secret-change-in-production-2024` | Secret key for signing user sessions |
+| `PORT` | `3001` | Server listening port |
 
 ---
 
-## Local Development Setup
+## 🚀 Local Development Setup
 
-To run the full client and server locally in parallel:
+To run both the Vite frontend and Express API server concurrently:
 
 ```bash
 # 1. Clone the repository
@@ -79,20 +80,20 @@ cd RotaFI
 # 2. Install dependencies
 npm install
 
-# 3. Set up local configuration
+# 3. Configure environment
 cp .env.example .env
-# Ensure MONGODB_URI, JWT_SECRET, and VITE_API_URL are set correctly.
+# Fill in VITE_CONTRACT_ID, MONGODB_URI, and VITE_API_URL
 
-# 4. Start both frontend and backend concurrently
+# 4. Start frontend and API server concurrently
 npm run dev
 ```
 
-* **Vite Frontend**: `http://localhost:5173`
-* **Express Backend**: `http://localhost:3001`
+* **Frontend**: `http://localhost:5173`
+* **API Server**: `http://localhost:3001`
 
 ---
 
-## Architecture & Data Flow
+## 🏗️ Architecture & Data Flow
 
 ```
 ┌────────────────────────┐         REST / JWT          ┌────────────────────────┐
@@ -107,38 +108,38 @@ npm run dev
 └────────────────────────┘
 ```
 
-1. **User Sign Up & Auth**: Users register with email and password. Sessions are securely managed via JWT tokens and local storage.
-2. **Freighter Linking**: Users link their Freighter wallet directly from their profile. The wallet address is bound to their MongoDB profile.
-3. **Committees & Bids**: Active bidding groups allow members to place bids. The highest discount wins the pot.
-4. **Credit Score**: The system monitors transactions: on-time payments boost scores (+15), while defaults deduct points (-100), simulating a portable credit bureau.
-5. **Simulated Anchors**: Users can deposit/withdraw mock INR assets through UPI, converting INR to XLM via simulated anchor rails.
+1. **User Sign Up & Auth**: Users create an account (JWT session stored securely).
+2. **Freighter Linking**: Users link their Freighter wallet directly from their profile.
+3. **Committees & Bidding**: Active bidding groups allow members to submit discount bids. The highest discount wins the pot, and savings are distributed as dividends.
+4. **Credit Trust Score**: Evaluates user behavior (+15 for on-time payment, +30 for bid win, +10 for fiat deposit, -100 for default).
+5. **Simulated Fiat Anchor**: Users deposit/withdraw mock INR assets through UPI, converting INR to XLM.
 
 ---
 
-## Smart Contract Commands
+## 📜 Smart Contract Compilation & Deployment
 
-The contract source files are located in `/contracts`.
+The Soroban Rust smart contract source is located in `contracts/rotafi`.
 
 ```bash
-# Compile contracts to WASM targets
-stellar contract build
+# 1. Load Cargo environment
+source $HOME/.cargo/env
 
-# Deploy WASM target to testnet (requires stellar-cli)
+# 2. Add WASM target
+rustup target add wasm32-unknown-unknown
+
+# 3. Compile and deploy contract to Stellar Testnet
 bash contracts/deploy.sh
 ```
 
 ---
 
-## Submission Checklist (Level 4)
+## 📋 Level 4 Submission Checklist
 
-- [x] Public GitHub repository
-- [x] README with complete documentation
-- [ ] Minimum 15+ meaningful commits *(in progress)*
-- [ ] Live demo link *(pending deployment)*
-- [ ] Contract deployment address *(pending)*
-- [ ] Screenshots — Product UI
-- [ ] Screenshots — Mobile responsive design
-- [ ] Screenshots — Analytics / monitoring
-- [ ] Demo video link
-- [ ] Proof of 10+ user wallet interactions
-- [ ] Basic user feedback summary
+- [x] **Public GitHub Repository**: Source code publicly available.
+- [x] **README Documentation**: Full setup, architecture, and API configuration documented.
+- [x] **15+ Meaningful Commits**: Detailed git commit trajectory on `main`.
+- [x] **Smart Contract Deployed**: Contract live on Stellar Testnet (`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`).
+- [x] **Live Demo Deployments**: Frontend live on Vercel, API backend live on Render.
+- [x] **Monitoring & Analytics**: Sentry SDK & Vercel Analytics integrated into `index.html`.
+- [ ] **Proof of 10+ User Wallet Interactions**: *(Testing in progress)*
+- [ ] **Basic User Feedback Summary & Demo Video**: *(Recording in progress)*
