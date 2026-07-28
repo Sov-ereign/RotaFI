@@ -133,14 +133,22 @@ bash contracts/deploy.sh
 
 ---
 
+## 📸 Product Screenshots
+
+| Landing & Explore View | Profile, Credit Score & Reviews | Mobile Responsiveness |
+|---|---|---|
+| ![Landing Page](./public/landing_page.png) | ![Profile & Credit Score](./public/profile.png) | ![Mobile View](./public/mobile_responsiveness_ss.png) |
+
+---
+
 ## 📋 Level 4 Submission Checklist
 
 - [x] **Public GitHub Repository**: Source code publicly available.
-- [x] **README Documentation**: Full setup, architecture, and API configuration documented.
+- [x] **README Documentation**: Full setup, architecture, and screenshots documented.
 - [x] **15+ Meaningful Commits**: Detailed git commit trajectory on `main`.
 - [x] **Smart Contract Deployed**: Contract live on Stellar Testnet (`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`).
 - [x] **Live Demo Deployments**: Frontend live on Vercel, API backend live on Render.
-- [x] **Monitoring & Analytics**: Sentry SDK & Vercel Analytics integrated into `index.html`.
+- [x] **Monitoring & Analytics**: Sentry SDK & `@vercel/analytics` integrated directly into React layout.
 - [x] **Proof of 10+ User Wallet Interactions**: 10 Indian tester profiles created with linked Stellar Testnet Keypairs, UPI deposits, committee contributions, and bidding auction interactions.
-- [x] **Basic User Feedback Summary**: Platform Feedback Modal & Community Reviews Board built; 10 tester ratings & reviews collected and displayed on-chain/in-app.
+- [x] **Basic User Feedback Summary**: Platform Feedback Modal & Community Reviews Board built; 10 tester ratings & reviews collected and displayed in-app.
 - [ ] **Demo Video Link**: *(Recording in progress)*

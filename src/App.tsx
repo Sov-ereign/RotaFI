@@ -5,6 +5,7 @@ import { Logo } from './components/Logo';
 import { LandingPage } from './pages/LandingPage';
 import { lazy, Suspense } from 'react';
 import { Github } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 const DashboardPage = lazy(() =>
   import('./pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
@@ -96,6 +97,7 @@ export default function App() {
     <AppProvider>
       <Router />
       <Toaster />
+      <Analytics />
     </AppProvider>
   );
 }
