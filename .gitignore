@@ -21,3 +21,9 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Rust build artifacts
+target/
+**/target/
+**/*.wasm
+

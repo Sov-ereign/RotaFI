@@ -15,6 +15,20 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <!-- Production Monitoring & Analytics -->
+    <script defer src="https://cdn.vercel-insights.com/v1/script.debug.js"></script>
+    <!-- Sentry Error Tracking SDK -->
+    <script src="https://browser.sentry-cdn.com/7.57.0/bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && typeof Sentry !== 'undefined') {
+          Sentry.init({
+            dsn: "https://846e492265004ec99bf587fcf99e52ee@o4505342938841088.ingest.sentry.io/4505342940282880",
+            tracesSampleRate: 0.1,
+          });
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>

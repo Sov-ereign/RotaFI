@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 # deploy.sh — Build and deploy the RotaFi Soroban contract to Stellar testnet
-# Prerequisites:
-#   - Rust + cargo installed: https://rustup.rs
-#   - wasm32 target: rustup target add wasm32-unknown-unknown
-#   - Stellar CLI: cargo install --locked stellar-cli --features opt
-#   - A funded testnet account: stellar keys generate --global deployer --network testnet
-#   - Testnet funded via: stellar keys fund deployer --network testnet
 
 set -e
 
@@ -14,12 +8,26 @@ CONTRACT_DIR="$PROJECT_DIR/contracts/rotafi"
 NETWORK="testnet"
 ACCOUNT="deployer"   # change to your Stellar CLI key name
 
+# Check if deployer keys exist, if not generate and fund them
+echo "==> Setting up Stellar CLI keypair..."
+if ! stellar keys address "$ACCOUNT" &>/dev/null; then
+  echo "Key '$ACCOUNT' not found. Generating new keypair..."
+  stellar keys generate "$ACCOUNT" --network "$NETWORK"
+  echo "Funding key '$ACCOUNT' via Friendbot..."
+  stellar keys fund "$ACCOUNT" --network "$NETWORK"
+else
+  echo "Using existing key '$ACCOUNT' (Address: $(stellar keys address "$ACCOUNT"))"
+fi
+
 echo "==> Building contract (release wasm)..."
 cd "$CONTRACT_DIR"
 cargo build --target wasm32-unknown-unknown --release
 
-WASM="$CONTRACT_DIR/target/wasm32-unknown-unknown/release/rotafi.wasm"
-echo "==> Wasm built: $WASM"
+echo "==> Optimizing WASM binary for Soroban VM..."
+stellar contract optimize --wasm "$CONTRACT_DIR/target/wasm32-unknown-unknown/release/rotafi.wasm"
+
+WASM="$CONTRACT_DIR/target/wasm32-unknown-unknown/release/rotafi.optimized.wasm"
+echo "==> Optimized Wasm: $WASM"
 
 echo "==> Uploading contract wasm..."
 WASM_HASH=$(stellar contract upload \
