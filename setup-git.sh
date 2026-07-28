@@ -23,7 +23,7 @@ on the Stellar blockchain. This first commit ships the complete MVP:
 
 - React 18 + TypeScript + Vite frontend
 - Stellar keypair wallet (keypair generated client-side via stellar-sdk)
-- Supabase-backed committees, members, contributions & payouts
+- MongoDB Atlas backed committees, members, contributions & payouts
 - Deterministic rotation engine that mirrors Soroban contract logic
 - Full page set: Landing, Explore, Dashboard, Create, Committee Detail
 - Mobile-responsive UI with Tailwind CSS
