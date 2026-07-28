@@ -116,6 +116,15 @@ npm run dev
 
 ---
 
+## 📊 Production Monitoring & Analytics
+
+RotaFi has real-time performance telemetry and error monitoring built into the production architecture:
+
+* **Vercel Analytics SDK (`@vercel/analytics`)**: Integrated directly into the main React layout (`src/App.tsx`) to track page views, user navigation, and Web Vitals metrics in real time.
+* **Sentry Error Tracking SDK**: Embedded in `index.html` to capture unhandled client-side exceptions and network failure trace logs.
+
+---
+
 ## 📜 Smart Contract Compilation & Deployment
 
 The Soroban Rust smart contract source is located in `contracts/rotafi`.
