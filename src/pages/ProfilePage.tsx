@@ -489,7 +489,6 @@ export function ProfilePage() {
                 </div>
               )}
             </div>
-            </div>
           </div>
 
           {/* User Feedback & Testimonials Board */}
