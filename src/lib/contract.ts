@@ -4,7 +4,7 @@
 import { apiGet, apiPost, getStoredToken } from './api';
 import { signTx } from './wallet';
 import type {
-  Committee, CommitteeDetail, Identity, Bid, AnchorTx,
+  Committee, CommitteeDetail, Identity, Bid, AnchorTx, FeedbackItem,
 } from './types';
 
 // ── XLM formatting ─────────────────────────────────────────────────────────────
@@ -169,6 +169,20 @@ export async function createAnchorTransaction(
     amount_xlm: amountXlm,
     bank_details: bankDetails,
   });
+}
+
+// ── Feedback API methods ───────────────────────────────────────────────────────
+
+export async function fetchFeedbackList(): Promise<FeedbackItem[]> {
+  return apiGet<FeedbackItem[]>('/users/feedback');
+}
+
+export async function submitFeedback(
+  rating: number,
+  category: string,
+  comment: string,
+): Promise<FeedbackItem> {
+  return apiPost<FeedbackItem>('/users/feedback', { rating, category, comment });
 }
 
 export { STROOPS_PER_XLM } from './types';

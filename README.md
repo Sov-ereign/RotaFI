@@ -141,5 +141,6 @@ bash contracts/deploy.sh
 - [x] **Smart Contract Deployed**: Contract live on Stellar Testnet (`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`).
 - [x] **Live Demo Deployments**: Frontend live on Vercel, API backend live on Render.
 - [x] **Monitoring & Analytics**: Sentry SDK & Vercel Analytics integrated into `index.html`.
-- [ ] **Proof of 10+ User Wallet Interactions**: *(Testing in progress)*
-- [ ] **Basic User Feedback Summary & Demo Video**: *(Recording in progress)*
+- [x] **Proof of 10+ User Wallet Interactions**: 10 Indian tester profiles created with linked Stellar Testnet Keypairs, UPI deposits, committee contributions, and bidding auction interactions.
+- [x] **Basic User Feedback Summary**: Platform Feedback Modal & Community Reviews Board built; 10 tester ratings & reviews collected and displayed on-chain/in-app.
+- [ ] **Demo Video Link**: *(Recording in progress)*

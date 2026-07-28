@@ -1,6 +1,6 @@
 import express from 'express';
-import { User, Committee, Member, AnchorTx } from '../models.js';
-import { requireAuth } from '../middleware/auth.js';
+import { User, Committee, Member, AnchorTx, Feedback } from '../models.js';
+import { requireAuth, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -118,6 +118,41 @@ router.post('/anchor-tx', requireAuth, async (req, res) => {
     }
 
     res.status(201).json(tx.toJSON());
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+// GET /api/users/feedback — get all public feedback
+router.get('/feedback', async (_req, res) => {
+  try {
+    const feedbacks = await Feedback.find().sort({ created_at: -1 });
+    res.json(feedbacks.map(f => f.toJSON()));
+  } catch (e) {
+    res.status(500).json({ message: e.message });
+  }
+});
+
+// POST /api/users/feedback — submit user feedback
+router.post('/feedback', requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const { rating, category, comment } = req.body;
+    if (!rating || !comment) {
+      return res.status(400).json({ message: 'Rating and comment are required' });
+    }
+
+    const item = await Feedback.create({
+      user_id: user._id,
+      user_name: user.name,
+      rating: Number(rating),
+      category: category || 'General',
+      comment: comment.trim(),
+    });
+
+    res.status(201).json(item.toJSON());
   } catch (e) {
     res.status(500).json({ message: e.message });
   }

@@ -123,3 +123,16 @@ const AnchorTxSchema = new Schema({
 
 export const AnchorTx = mongoose.model('AnchorTx', AnchorTxSchema);
 
+// ── Feedback (User Ratings & Testimonials) ────────────────────────────────────
+const FeedbackSchema = new Schema({
+  user_id:      { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  user_name:    { type: String, required: true },
+  rating:       { type: Number, required: true, min: 1, max: 5 },
+  category:     { type: String, enum: ['UI/UX', 'Features', 'Smart Contracts', 'General'], default: 'General' },
+  comment:      { type: String, required: true, maxlength: 500 },
+  created_at:   { type: Date, default: Date.now },
+}, { toJSON });
+
+export const Feedback = mongoose.model('Feedback', FeedbackSchema);
+
+

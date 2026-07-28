@@ -115,6 +115,17 @@ export interface AnchorTx {
   created_at: string;
 }
 
+// ── Feedback (User Feedback & Testimonials) ────────────────────────────────────
+export interface FeedbackItem {
+  id: string;
+  user_id: string;
+  user_name: string;
+  rating: number;
+  category: 'UI/UX' | 'Features' | 'Smart Contracts' | 'General';
+  comment: string;
+  created_at: string;
+}
+
 // ── Joined shapes ─────────────────────────────────────────────────────────────
 
 export interface MemberWithStatus extends Member {

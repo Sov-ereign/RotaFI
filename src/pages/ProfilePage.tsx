@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import {
   User, Mail, Wallet, Shield, Edit2, Save, X, Loader2, ExternalLink,
   CalendarDays, Star, TrendingUp, Copy, Check, Link2Off, AlertCircle,
-  Send, Landmark, History, ArrowUpDown, ShieldCheck,
+  Send, Landmark, History, ArrowUpDown, ShieldCheck, MessageSquare, Plus,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { avatarGradient, initials, shortAddress, isFreighterSync } from '../lib/wallet';
 import { apiGet } from '../lib/api';
-import { fetchAnchorTransactions, createAnchorTransaction } from '../lib/contract';
-import type { Committee, AnchorTx } from '../lib/types';
+import { fetchAnchorTransactions, createAnchorTransaction, fetchFeedbackList } from '../lib/contract';
+import type { Committee, AnchorTx, FeedbackItem } from '../lib/types';
+import { FeedbackModal } from '../components/FeedbackModal';
 
 interface ProfileStats {
   committeesCreated: number;
@@ -32,6 +33,8 @@ export function ProfilePage() {
   const [anchorType, setAnchorType] = useState<'deposit' | 'withdrawal'>('deposit');
   const [upiId, setUpiId] = useState('');
   const [simulatingAnchor, setSimulatingAnchor] = useState(false);
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
   const loadProfileData = () => {
@@ -40,11 +43,13 @@ export function ProfilePage() {
       apiGet<{ stats: ProfileStats; credit_score: number } & Record<string, unknown>>('/users/profile'),
       apiGet<Committee[]>('/users/my-committees'),
       fetchAnchorTransactions(),
-    ]).then(([profile, committees, txs]) => {
+      fetchFeedbackList(),
+    ]).then(([profile, committees, txs, fbs]) => {
       setStats(profile.stats);
       setCreditScore(profile.credit_score || 650);
       setMyCommittees(committees);
       setAnchorTxs(txs);
+      setFeedbacks(fbs);
     }).catch(() => {}).finally(() => setLoadingData(false));
   };
 
@@ -484,9 +489,65 @@ export function ProfilePage() {
                 </div>
               )}
             </div>
+            </div>
+          </div>
+
+          {/* User Feedback & Testimonials Board */}
+          <div className="card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-ink-900 flex items-center gap-2">
+                <MessageSquare className="h-4.5 w-4.5 text-brand-500" /> Platform Feedback & Reviews
+              </h3>
+              <button
+                onClick={() => setIsFeedbackOpen(true)}
+                className="btn-primary btn-sm flex items-center gap-1 text-xs"
+              >
+                <Plus className="h-3.5 w-3.5" /> Give Feedback
+              </button>
+            </div>
+            <p className="text-xs text-ink-400">
+              Community feedback and platform reviews submitted by RotaFi members and committee participants.
+            </p>
+
+            {feedbacks.length === 0 ? (
+              <p className="text-xs text-ink-400 italic text-center py-4">No reviews submitted yet. Be the first to rate RotaFi!</p>
+            ) : (
+              <div className="max-h-64 overflow-y-auto space-y-2.5 pr-1">
+                {feedbacks.map((fb) => (
+                  <div key={fb.id} className="rounded-xl border border-ink-150 p-3 bg-white space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-xs text-ink-900">{fb.user_name}</span>
+                        <span className="badge text-[9px] font-bold bg-brand-50 text-brand-700 ring-1 ring-brand-200">
+                          {fb.category}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`h-3 w-3 ${s <= fb.rating ? 'fill-amber-400 text-amber-400' : 'text-ink-200'}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-ink-600 leading-relaxed">{fb.comment}</p>
+                    <span className="text-[9px] text-ink-400 block pt-0.5">
+                      {new Date(fb.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+        onSubmitted={loadProfileData}
+      />
     </div>
   );
 }
