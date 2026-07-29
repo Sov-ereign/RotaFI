@@ -26,6 +26,7 @@ Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed or
 ## 🔗 Live Deployments & Contracts
 
 * **Frontend Web App**: [https://rota-fi-omega.vercel.app](https://rota-fi-omega.vercel.app)
+* **Demo Video Walkthrough**: [Watch Video on YouTube](https://youtu.be/7MvsmhCuuSM)
 * **Backend API Server**: [https://rotafi-hw2t.onrender.com/api](https://rotafi-hw2t.onrender.com/api)
 * **Stellar Testnet Contract ID**: [`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`](https://lab.stellar.org/r/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
 * **Stellar Expert Explorer**: [View Contract on Explorer](https://stellar.expert/explorer/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
@@ -160,4 +161,4 @@ bash contracts/deploy.sh
 - [x] **Monitoring & Analytics**: Sentry SDK & `@vercel/analytics` integrated directly into React layout.
 - [x] **Proof of 10+ User Wallet Interactions**: 10 Indian tester profiles created with linked Stellar Testnet Keypairs, UPI deposits, committee contributions, and bidding auction interactions.
 - [x] **Basic User Feedback Summary**: Platform Feedback Modal & Community Reviews Board built; 10 tester ratings & reviews collected and displayed in-app.
-- [ ] **Demo Video Link**: *(Recording in progress)*
+- [x] **Demo Video Link**: [Watch 2-Minute Video Walkthrough on YouTube](https://youtu.be/7MvsmhCuuSM)
