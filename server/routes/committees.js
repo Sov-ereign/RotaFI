@@ -12,15 +12,17 @@ async function logActivity(committeeId, eventType, actorWallet, summary, metadat
 
 function buildDetail(committee, members, contributions, payouts, activity, userId, walletAddress, bids = []) {
   const membersWithStatus = members.map(m => {
-    const mc = contributions.filter(c => c.member_id.toString() === m._id.toString());
+    const mObj = typeof m.toJSON === 'function' ? m.toJSON() : m;
+    const mc = contributions.filter(c => c.member_id.toString() === (m._id || m.id).toString());
     const cur = mc.find(c => c.cycle_index === committee.current_cycle) ?? null;
+    const curObj = cur ? (typeof cur.toJSON === 'function' ? cur.toJSON() : cur) : null;
     return {
-      ...m.toJSON(),
-      contributions: mc.map(c => c.toJSON()),
+      ...mObj,
+      contributions: mc.map(c => typeof c.toJSON === 'function' ? c.toJSON() : c),
       totalPaid: mc.filter(c => c.status === 'paid').reduce((s, c) => s + c.amount, 0),
       cyclesPaid: mc.filter(c => c.status === 'paid').length,
       cyclesDefaulted: mc.filter(c => c.status === 'defaulted').length,
-      currentCycleContribution: cur ? cur.toJSON() : null,
+      currentCycleContribution: curObj,
     };
   });
 
