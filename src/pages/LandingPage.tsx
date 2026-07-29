@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import {
   ArrowRight, ShieldCheck, Users, Coins, CalendarClock, Layers, Zap, Globe,
-  ScrollText, AlertTriangle, Lock, Sparkles, CheckCircle2, Quote,
+  ScrollText, AlertTriangle, Lock, Sparkles, CheckCircle2, Quote, Star, MessageSquare,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { fetchAllPublicCommittees, fetchMemberCount } from '../lib/contract';
-import type { Committee } from '../lib/types';
+import { fetchAllPublicCommittees, fetchMemberCount, fetchFeedbackList } from '../lib/contract';
+import type { Committee, FeedbackItem } from '../lib/types';
 import { CommitteeCard } from '../components/CommitteeCard';
 
 export function LandingPage() {
@@ -33,6 +33,7 @@ export function LandingPage() {
       <StellarRationale />
       {committees.length > 0 && <LiveCommittees committees={committees} counts={counts} />}
       <ForWhom />
+      <Testimonials />
       <FAQ />
       <CTA identity={!!identity} onStart={() => navigate(identity ? { name: 'create' } : { name: 'landing' })} />
     </div>
@@ -345,6 +346,61 @@ function FAQ() {
             </summary>
             <p className="mt-3 text-sm leading-relaxed text-ink-600">{f.a}</p>
           </details>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
+
+  useEffect(() => {
+    fetchFeedbackList()
+      .then(fbs => setFeedbacks(fbs.slice(0, 6)))
+      .catch(() => {});
+  }, []);
+
+  if (feedbacks.length === 0) return null;
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="text-center max-w-2xl mx-auto mb-10">
+        <span className="badge bg-brand-50 text-brand-700 ring-1 ring-brand-200">
+          <MessageSquare className="h-3 w-3 mr-1" /> Community Reviews
+        </span>
+        <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">
+          What our members are saying
+        </h2>
+        <p className="mt-2 text-sm text-ink-500">
+          Real feedback submitted by ROSCA participants and committee organizers across India.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {feedbacks.map((fb) => (
+          <div key={fb.id} className="card p-5 space-y-3 bg-white flex flex-col justify-between hover:shadow-lift transition">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${star <= fb.rating ? 'fill-amber-400 text-amber-400' : 'text-ink-200'}`}
+                    />
+                  ))}
+                </div>
+                <span className="badge text-[10px] font-bold bg-ink-100 text-ink-600">
+                  {fb.category}
+                </span>
+              </div>
+              <p className="text-xs text-ink-700 leading-relaxed italic">"{fb.comment}"</p>
+            </div>
+            <div className="pt-2 border-t border-ink-100 flex items-center justify-between">
+              <span className="font-semibold text-xs text-ink-900">{fb.user_name}</span>
+              <span className="text-[10px] text-ink-400">Verified Member</span>
+            </div>
+          </div>
         ))}
       </div>
     </section>

@@ -38,22 +38,22 @@ export function ProfilePage() {
   const [loadingData, setLoadingData] = useState(true);
 
   const loadProfileData = () => {
+    fetchFeedbackList().then(fbs => setFeedbacks(fbs)).catch(() => {});
     if (!identity) return;
     Promise.all([
       apiGet<{ stats: ProfileStats; credit_score: number } & Record<string, unknown>>('/users/profile'),
       apiGet<Committee[]>('/users/my-committees'),
       fetchAnchorTransactions(),
-      fetchFeedbackList(),
-    ]).then(([profile, committees, txs, fbs]) => {
+    ]).then(([profile, committees, txs]) => {
       setStats(profile.stats);
       setCreditScore(profile.credit_score || 650);
       setMyCommittees(committees);
       setAnchorTxs(txs);
-      setFeedbacks(fbs);
     }).catch(() => {}).finally(() => setLoadingData(false));
   };
 
   useEffect(() => {
+    fetchFeedbackList().then(fbs => setFeedbacks(fbs)).catch(() => {});
     loadProfileData();
   }, [identity]);
 
