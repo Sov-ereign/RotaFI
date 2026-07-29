@@ -9,7 +9,8 @@ export type Route =
   | { name: 'create' }
   | { name: 'committee'; id: string }
   | { name: 'explore' }
-  | { name: 'profile' };
+  | { name: 'profile' }
+  | { name: 'feedback' };
 
 interface ToastMessage {
   id: number;

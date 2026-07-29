@@ -9,6 +9,7 @@ export function Header() {
     { label: 'Explore', route: { name: 'explore' }, show: true },
     { label: 'Dashboard', route: { name: 'dashboard' }, show: !!identity },
     { label: 'Create', route: { name: 'create' }, show: !!identity },
+    { label: 'Feedback', route: { name: 'feedback' }, show: true },
   ];
 
   const isActive = (name: string) => route.name === name;
