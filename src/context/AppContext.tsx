@@ -50,6 +50,7 @@ function parseHash(): Route {
   if (seg === 'create') return { name: 'create' };
   if (seg === 'explore') return { name: 'explore' };
   if (seg === 'profile') return { name: 'profile' };
+  if (seg === 'feedback') return { name: 'feedback' };
   if (seg === 'committee' && id) return { name: 'committee', id };
   return { name: 'landing' };
 }
@@ -61,6 +62,7 @@ function routeToHash(route: Route): string {
     case 'create': return '#/create';
     case 'explore': return '#/explore';
     case 'profile': return '#/profile';
+    case 'feedback': return '#/feedback';
     case 'committee': return `#/committee/${route.id}`;
   }
 }
