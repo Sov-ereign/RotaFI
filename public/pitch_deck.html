@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RotaFi — Level 5 Product Pitch Deck</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
   <style>
     :root {
       --brand: #059669;
@@ -20,7 +23,12 @@
       --border: #334155;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
       background: var(--bg);
@@ -56,11 +64,20 @@
       animation: fadeIn 0.4s ease-in-out;
     }
 
-    .slide.active { display: flex; }
+    .slide.active {
+      display: flex;
+    }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .tag {
@@ -78,12 +95,37 @@
       letter-spacing: 0.05em;
     }
 
-    h1 { font-size: 40px; font-weight: 800; line-height: 1.15; color: #ffffff; }
-    h2 { font-size: 32px; font-weight: 800; color: #ffffff; margin-bottom: 12px; }
-    p { font-size: 16px; color: #94a3b8; line-height: 1.6; }
+    h1 {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #ffffff;
+    }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
 
     .card {
       background: rgba(30, 41, 59, 0.7);
@@ -92,11 +134,29 @@
       padding: 20px;
     }
 
-    .card h3 { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
-    .card p { font-size: 13px; color: #94a3b8; }
+    .card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 8px;
+    }
 
-    .stat-number { font-size: 36px; font-weight: 800; color: #10b981; }
-    .stat-label { font-size: 13px; color: #94a3b8; font-weight: 600; }
+    .card p {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: 800;
+      color: #10b981;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
 
     .nav-bar {
       height: 60px;
@@ -120,291 +180,321 @@
       transition: all 0.2s;
     }
 
-    .btn-nav:hover { background: #10b981; color: #000; border-color: #10b981; }
+    .btn-nav:hover {
+      background: #10b981;
+      color: #000;
+      border-color: #10b981;
+    }
 
-    .dots { display: flex; gap: 6px; }
-    .dot { width: 8px; height: 8px; border-radius: 9999px; background: #334155; transition: all 0.2s; }
-    .dot.active { background: #10b981; width: 20px; }
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #334155;
+      transition: all 0.2s;
+    }
+
+    .dot.active {
+      background: #10b981;
+      width: 20px;
+    }
   </style>
 </head>
+
 <body>
 
-<div class="deck-container">
-  <!-- Slide 1: Cover -->
-  <div class="slide active" id="slide-1">
-    <div>
-      <span class="tag">🚀 Level 5 Pitch Deck</span>
-      <h1 style="margin-top: 20px;">RotaFi</h1>
-      <p style="font-size: 20px; color: #34d399; font-weight: 600; margin-top: 8px;">
-        Transparent Rotating Savings & Chit Funds on Stellar
-      </p>
-      <p style="margin-top: 16px; max-width: 600px;">
-        Digitizing informal ROSCAs with Soroban Smart Contracts, Bidding Auctions, UPI Fiat Rails, and Portable Credit Trust Scores.
-      </p>
+  <div class="deck-container">
+    <!-- Slide 1: Cover -->
+    <div class="slide active" id="slide-1">
+      <div>
+        <span class="tag">🚀 Level 5 Pitch Deck</span>
+        <h1 style="margin-top: 20px;">RotaFi</h1>
+        <p style="font-size: 20px; color: #34d399; font-weight: 600; margin-top: 8px;">
+          Transparent Rotating Savings & Chit Funds on Stellar
+        </p>
+        <p style="margin-top: 16px; max-width: 600px;">
+          Digitizing informal ROSCAs with Soroban Smart Contracts, Bidding Auctions, UPI Fiat Rails, and Portable Credit
+          Trust Scores.
+        </p>
+      </div>
+      <div style="display: flex; gap: 30px;">
+        <div><span class="stat-number">50+</span>
+          <div class="stat-label">Testnet Users</div>
+        </div>
+        <div><span class="stat-number">$800B</span>
+          <div class="stat-label">Global ROSCA Market</div>
+        </div>
+        <div><span class="stat-number">100%</span>
+          <div class="stat-label">On-Chain Transparency</div>
+        </div>
+      </div>
     </div>
-    <div style="display: flex; gap: 30px;">
-      <div><span class="stat-number">50+</span><div class="stat-label">Testnet Users</div></div>
-      <div><span class="stat-number">$800B</span><div class="stat-label">Global ROSCA Market</div></div>
-      <div><span class="stat-number">100%</span><div class="stat-label">On-Chain Transparency</div></div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide" id="slide-2">
+      <div>
+        <span class="tag">⚠️ The Problem</span>
+        <h2 style="margin-top: 12px;">$800B Informal Savings Market is Broken</h2>
+        <p>Over 1 Billion people rely on informal ROSCAs (chit funds), but traditional operations face critical
+          vulnerabilities:</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>🚨 Organizer Fraud</h3>
+          <p>Unlicensed organizers run off with member contributions. Zero recourse or recovery mechanisms.</p>
+        </div>
+        <div class="card">
+          <h3>📜 Zero Credit History</h3>
+          <p>Years of on-time ROSCA savings build 0 credit history for informal savers with traditional banks.</p>
+        </div>
+        <div class="card">
+          <h3>🔒 Rigid Payout Rules</h3>
+          <p>Fixed lottery payout orders do not serve members needing urgent liquidity or working capital.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: The Solution -->
+    <div class="slide" id="slide-3">
+      <div>
+        <span class="tag">💡 The Solution</span>
+        <h2 style="margin-top: 12px;">RotaFi: Trustless ROSCAs on Stellar</h2>
+        <p>Soroban smart contracts replace informal organizers with automated, transparent code.</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>⚡ Soroban Smart Contract Engine</h3>
+          <p>Automated cycle rotation, deterministic pot distribution, and on-chain audit trail.</p>
+        </div>
+        <div class="card">
+          <h3>🏷️ Competitive Bidding Auctions</h3>
+          <p>Members bid discounts for early payouts; savings are refunded back as member dividend rebates.</p>
+        </div>
+        <div class="card">
+          <h3>📊 Credit Reputation Score (300–900)</h3>
+          <p>On-chain repayment history generates a portable credit score (+15 on payment, -100 on default).</p>
+        </div>
+        <div class="card">
+          <h3>🇮🇳 Simulated UPI Fiat Anchor</h3>
+          <p>Direct INR ↔ XLM exchange rails for seamless mobile fiat deposits.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Market Opportunity -->
+    <div class="slide" id="slide-4">
+      <div>
+        <span class="tag">🌍 Market Opportunity</span>
+        <h2 style="margin-top: 12px;">Massive TAM across Emerging Markets</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <span class="stat-number">$800B</span>
+          <h3>Global Informal ROSCAs</h3>
+          <p>Widespread across India (Chit funds), LatAm (Tandas), Africa (Esusu), and SE Asia (Hui).</p>
+        </div>
+        <div class="card">
+          <span class="stat-number">500M+</span>
+          <h3>Unbanked Savers</h3>
+          <p>Need verifiable credit scores to transition into formal DeFi financial services.</p>
+        </div>
+        <div class="card">
+          <span class="stat-number">$50B</span>
+          <h3>Indian Registered Chit Funds</h3>
+          <p>Formalized sector ripe for blockchain modernization and cost reduction.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Technical Architecture -->
+    <div class="slide" id="slide-5">
+      <div>
+        <span class="tag">🏗️ Technical Architecture</span>
+        <h2 style="margin-top: 12px;">Production-Grade Stack</h2>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Smart Contracts</h3>
+          <p>Soroban Rust contract deployed on Stellar Testnet (ID: <code>CATIML...2N4D</code>).</p>
+        </div>
+        <div class="card">
+          <h3>Frontend Web App</h3>
+          <p>React 18 + TypeScript + Tailwind CSS deployed on Vercel with `@vercel/analytics`.</p>
+        </div>
+        <div class="card">
+          <h3>Backend API Server</h3>
+          <p>Node.js / Express REST API deployed on Render with MongoDB Atlas database.</p>
+        </div>
+        <div class="card">
+          <h3>Monitoring & Telemetry</h3>
+          <p>Client-side error tracking via Sentry SDK & real-time Web Vitals metrics.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Traction & User Growth -->
+    <div class="slide" id="slide-6">
+      <div>
+        <span class="tag">📈 Level 5 User Growth</span>
+        <h2 style="margin-top: 12px;">50+ Onboarded Testnet Users</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <span class="stat-number">50 Users</span>
+          <h3>Onboarded Testers</h3>
+          <p>Registered with Stellar Keypair wallets, UPI deposits & feedback.</p>
+        </div>
+        <div class="card">
+          <span class="stat-number">100%</span>
+          <h3>CSV Record Dataset</h3>
+          <p>Exported to <code>rotafi_50_testers_feedback.csv</code> linked in README.</p>
+        </div>
+        <div class="card">
+          <span class="stat-number">30+</span>
+          <h3>Git Commits</h3>
+          <p>Meaningful commit trajectory on GitHub <code>main</code> branch.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: Feedback-Driven Product Evolution -->
+    <div class="slide" id="slide-7">
+      <div>
+        <span class="tag">🔄 Feedback Iterations</span>
+        <h2 style="margin-top: 12px;">User-Driven Product Evolution</h2>
+        <p>3 major features implemented based on tester feedback (with commit links):</p>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>🔔 Payment Reminders</h3>
+          <p>Automated alert schedule modal before cycle deadlines (Commit <code>8a744ca</code>).</p>
+        </div>
+        <div class="card">
+          <h3>🛡️ Collateral Shield</h3>
+          <p>100% collateralized reserve fund tracking to protect pools (Commit <code>9a17708</code>).</p>
+        </div>
+        <div class="card">
+          <h3>✨ Stellar Yield Vault</h3>
+          <p>+4.8% APY yield boost indicator on active cycle pools (Commit <code>9a17708</code>).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: Business Model -->
+    <div class="slide" id="slide-8">
+      <div>
+        <span class="tag">💼 Business Model</span>
+        <h2 style="margin-top: 12px;">Sustainable Revenue Streams</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>0.5% Protocol Fee</h3>
+          <p>Charged on total pot distribution per cycle (substantially cheaper than traditional 5% chit fund fees).</p>
+        </div>
+        <div class="card">
+          <h3>Credit API Licensing</h3>
+          <p>Monetize anonymized Credit Trust Score API data to micro-finance institutions & lenders.</p>
+        </div>
+        <div class="card">
+          <h3>Yield Revenue Share</h3>
+          <p>Share yield generated from idle liquidity pool reserves during cycle progression.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: Future Roadmap -->
+    <div class="slide" id="slide-9">
+      <div>
+        <span class="tag">🗺️ Future Roadmap</span>
+        <h2 style="margin-top: 12px;">Scale to Mainnet & Beyond</h2>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Q3 2026: Mainnet Launch</h3>
+          <p>Audit Soroban contracts & deploy on Stellar Mainnet with real USDC/XLM pools.</p>
+        </div>
+        <div class="card">
+          <h3>Q4 2026: Cross-Border ROSCAs</h3>
+          <p>Enable multi-currency remittance savings pools for global diaspora communities.</p>
+        </div>
+        <div class="card">
+          <h3>Q1 2027: Credit Bureau API</h3>
+          <p>Partner with credit bureaus to bridge on-chain ROSCA credit scores to formal banking.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: Conclusion -->
+    <div class="slide" id="slide-10">
+      <div style="text-align: center; margin: auto;">
+        <span class="tag">✨ Thank You</span>
+        <h1 style="margin-top: 16px;">Building the Future of Savings on Stellar</h1>
+        <p style="margin-top: 12px; font-size: 18px;">
+          Join us in making informal ROSCAs transparent, trustless, and rewarding worldwide.
+        </p>
+        <div style="margin-top: 24px; font-size: 14px; color: #34d399; font-weight: 600;">
+          <a href="https://rota-fi-omega.vercel.app" target="_blank">Live App: https://rota-fi-omega.vercel.app</a>
+          &nbsp;|&nbsp; 💻
+          <a href="https://github.com/Sov-ereign/RotaFI" target="_blank">Sov-ereign/RotaFI</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+      <button class="btn-nav" onclick="prevSlide()">← Previous</button>
+      <div class="dots" id="dotsContainer"></div>
+      <button class="btn-nav" onclick="nextSlide()">Next →</button>
     </div>
   </div>
 
-  <!-- Slide 2: The Problem -->
-  <div class="slide" id="slide-2">
-    <div>
-      <span class="tag">⚠️ The Problem</span>
-      <h2 style="margin-top: 12px;">$800B Informal Savings Market is Broken</h2>
-      <p>Over 1 Billion people rely on informal ROSCAs (chit funds), but traditional operations face critical vulnerabilities:</p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <h3>🚨 Organizer Fraud</h3>
-        <p>Unlicensed organizers run off with member contributions. Zero recourse or recovery mechanisms.</p>
-      </div>
-      <div class="card">
-        <h3>📜 Zero Credit History</h3>
-        <p>Years of on-time ROSCA savings build 0 credit history for informal savers with traditional banks.</p>
-      </div>
-      <div class="card">
-        <h3>🔒 Rigid Payout Rules</h3>
-        <p>Fixed lottery payout orders do not serve members needing urgent liquidity or working capital.</p>
-      </div>
-    </div>
-  </div>
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
 
-  <!-- Slide 3: The Solution -->
-  <div class="slide" id="slide-3">
-    <div>
-      <span class="tag">💡 The Solution</span>
-      <h2 style="margin-top: 12px;">RotaFi: Trustless ROSCAs on Stellar</h2>
-      <p>Soroban smart contracts replace informal organizers with automated, transparent code.</p>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3>⚡ Soroban Smart Contract Engine</h3>
-        <p>Automated cycle rotation, deterministic pot distribution, and on-chain audit trail.</p>
-      </div>
-      <div class="card">
-        <h3>🏷️ Competitive Bidding Auctions</h3>
-        <p>Members bid discounts for early payouts; savings are refunded back as member dividend rebates.</p>
-      </div>
-      <div class="card">
-        <h3>📊 Credit Reputation Score (300–900)</h3>
-        <p>On-chain repayment history generates a portable credit score (+15 on payment, -100 on default).</p>
-      </div>
-      <div class="card">
-        <h3>🇮🇳 Simulated UPI Fiat Anchor</h3>
-        <p>Direct INR ↔ XLM exchange rails for seamless mobile fiat deposits.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 4: Market Opportunity -->
-  <div class="slide" id="slide-4">
-    <div>
-      <span class="tag">🌍 Market Opportunity</span>
-      <h2 style="margin-top: 12px;">Massive TAM across Emerging Markets</h2>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <span class="stat-number">$800B</span>
-        <h3>Global Informal ROSCAs</h3>
-        <p>Widespread across India (Chit funds), LatAm (Tandas), Africa (Esusu), and SE Asia (Hui).</p>
-      </div>
-      <div class="card">
-        <span class="stat-number">500M+</span>
-        <h3>Unbanked Savers</h3>
-        <p>Need verifiable credit scores to transition into formal DeFi financial services.</p>
-      </div>
-      <div class="card">
-        <span class="stat-number">$50B</span>
-        <h3>Indian Registered Chit Funds</h3>
-        <p>Formalized sector ripe for blockchain modernization and cost reduction.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 5: Technical Architecture -->
-  <div class="slide" id="slide-5">
-    <div>
-      <span class="tag">🏗️ Technical Architecture</span>
-      <h2 style="margin-top: 12px;">Production-Grade Stack</h2>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3>Smart Contracts</h3>
-        <p>Soroban Rust contract deployed on Stellar Testnet (ID: <code>CATIML...2N4D</code>).</p>
-      </div>
-      <div class="card">
-        <h3>Frontend Web App</h3>
-        <p>React 18 + TypeScript + Tailwind CSS deployed on Vercel with `@vercel/analytics`.</p>
-      </div>
-      <div class="card">
-        <h3>Backend API Server</h3>
-        <p>Node.js / Express REST API deployed on Render with MongoDB Atlas database.</p>
-      </div>
-      <div class="card">
-        <h3>Monitoring & Telemetry</h3>
-        <p>Client-side error tracking via Sentry SDK & real-time Web Vitals metrics.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 6: Traction & User Growth -->
-  <div class="slide" id="slide-6">
-    <div>
-      <span class="tag">📈 Level 5 User Growth</span>
-      <h2 style="margin-top: 12px;">50+ Onboarded Testnet Users</h2>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <span class="stat-number">50 Users</span>
-        <h3>Onboarded Testers</h3>
-        <p>Registered with Stellar Keypair wallets, UPI deposits & feedback.</p>
-      </div>
-      <div class="card">
-        <span class="stat-number">100%</span>
-        <h3>CSV Record Dataset</h3>
-        <p>Exported to <code>rotafi_50_testers_feedback.csv</code> linked in README.</p>
-      </div>
-      <div class="card">
-        <span class="stat-number">30+</span>
-        <h3>Git Commits</h3>
-        <p>Meaningful commit trajectory on GitHub <code>main</code> branch.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 7: Feedback-Driven Product Evolution -->
-  <div class="slide" id="slide-7">
-    <div>
-      <span class="tag">🔄 Feedback Iterations</span>
-      <h2 style="margin-top: 12px;">User-Driven Product Evolution</h2>
-      <p>3 major features implemented based on tester feedback (with commit links):</p>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <h3>🔔 Payment Reminders</h3>
-        <p>Automated alert schedule modal before cycle deadlines (Commit <code>8a744ca</code>).</p>
-      </div>
-      <div class="card">
-        <h3>🛡️ Collateral Shield</h3>
-        <p>100% collateralized reserve fund tracking to protect pools (Commit <code>9a17708</code>).</p>
-      </div>
-      <div class="card">
-        <h3>✨ Stellar Yield Vault</h3>
-        <p>+4.8% APY yield boost indicator on active cycle pools (Commit <code>9a17708</code>).</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 8: Business Model -->
-  <div class="slide" id="slide-8">
-    <div>
-      <span class="tag">💼 Business Model</span>
-      <h2 style="margin-top: 12px;">Sustainable Revenue Streams</h2>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <h3>0.5% Protocol Fee</h3>
-        <p>Charged on total pot distribution per cycle (substantially cheaper than traditional 5% chit fund fees).</p>
-      </div>
-      <div class="card">
-        <h3>Credit API Licensing</h3>
-        <p>Monetize anonymized Credit Trust Score API data to micro-finance institutions & lenders.</p>
-      </div>
-      <div class="card">
-        <h3>Yield Revenue Share</h3>
-        <p>Share yield generated from idle liquidity pool reserves during cycle progression.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 9: Future Roadmap -->
-  <div class="slide" id="slide-9">
-    <div>
-      <span class="tag">🗺️ Future Roadmap</span>
-      <h2 style="margin-top: 12px;">Scale to Mainnet & Beyond</h2>
-    </div>
-    <div class="grid-3">
-      <div class="card">
-        <h3>Q3 2026: Mainnet Launch</h3>
-        <p>Audit Soroban contracts & deploy on Stellar Mainnet with real USDC/XLM pools.</p>
-      </div>
-      <div class="card">
-        <h3>Q4 2026: Cross-Border ROSCAs</h3>
-        <p>Enable multi-currency remittance savings pools for global diaspora communities.</p>
-      </div>
-      <div class="card">
-        <h3>Q1 2027: Credit Bureau API</h3>
-        <p>Partner with credit bureaus to bridge on-chain ROSCA credit scores to formal banking.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Slide 10: Conclusion -->
-  <div class="slide" id="slide-10">
-    <div style="text-align: center; margin: auto;">
-      <span class="tag">✨ Thank You</span>
-      <h1 style="margin-top: 16px;">Building the Future of Savings on Stellar</h1>
-      <p style="margin-top: 12px; font-size: 18px;">
-        Join us in making informal ROSCAs transparent, trustless, and rewarding worldwide.
-      </p>
-      <div style="margin-top: 24px; font-size: 14px; color: #34d399; font-weight: 600;">
-        🔗 Live App: https://rota-fi-omega.vercel.app &nbsp;|&nbsp; 💻 GitHub: Sov-ereign/RotaFI
-      </div>
-    </div>
-  </div>
-
-  <!-- Navigation -->
-  <div class="nav-bar">
-    <button class="btn-nav" onclick="prevSlide()">← Previous</button>
-    <div class="dots" id="dotsContainer"></div>
-    <button class="btn-nav" onclick="nextSlide()">Next →</button>
-  </div>
-</div>
-
-<script>
-  let currentSlide = 1;
-  const totalSlides = 10;
-
-  function updateSlides() {
-    for (let i = 1; i <= totalSlides; i++) {
-      document.getElementById(`slide-${i}`).classList.toggle('active', i === currentSlide);
+    function updateSlides() {
+      for (let i = 1; i <= totalSlides; i++) {
+        document.getElementById(`slide-${i}`).classList.toggle('active', i === currentSlide);
+      }
+      renderDots();
     }
+
+    function renderDots() {
+      const container = document.getElementById('dotsContainer');
+      container.innerHTML = '';
+      for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = `dot ${i === currentSlide ? 'active' : ''}`;
+        dot.onclick = () => { currentSlide = i; updateSlides(); };
+        container.appendChild(dot);
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) currentSlide++;
+      else currentSlide = 1;
+      updateSlides();
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) currentSlide--;
+      else currentSlide = totalSlides;
+      updateSlides();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
     renderDots();
-  }
-
-  function renderDots() {
-    const container = document.getElementById('dotsContainer');
-    container.innerHTML = '';
-    for (let i = 1; i <= totalSlides; i++) {
-      const dot = document.createElement('div');
-      dot.className = `dot ${i === currentSlide ? 'active' : ''}`;
-      dot.onclick = () => { currentSlide = i; updateSlides(); };
-      container.appendChild(dot);
-    }
-  }
-
-  function nextSlide() {
-    if (currentSlide < totalSlides) currentSlide++;
-    else currentSlide = 1;
-    updateSlides();
-  }
-
-  function prevSlide() {
-    if (currentSlide > 1) currentSlide--;
-    else currentSlide = totalSlides;
-    updateSlides();
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
-    if (e.key === 'ArrowLeft') prevSlide();
-  });
-
-  renderDots();
-</script>
+  </script>
 
 </body>
+
 </html>
