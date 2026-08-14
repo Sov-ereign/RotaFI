@@ -26,6 +26,7 @@ Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed or
 ## 🔗 Live Deployments & Contracts
 
 * **Frontend Web App**: [https://rota-fi-omega.vercel.app](https://rota-fi-omega.vercel.app)
+* **Level 5 Pitch Deck Presentation**: [View 10-Slide Pitch Deck](https://rota-fi-omega.vercel.app/pitch_deck.html)
 * **Demo Video Walkthrough**: [Watch Video on YouTube](https://youtu.be/7MvsmhCuuSM)
 * **Backend API Server**: [https://rotafi-hw2t.onrender.com/api](https://rotafi-hw2t.onrender.com/api)
 * **Stellar Testnet Contract ID**: [`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`](https://lab.stellar.org/r/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
@@ -194,5 +195,5 @@ Based on feedback collected from our 50 onboarded testers, we implemented 3 majo
 - [x] **Proof of 50+ Testnet Users**: 50 Indian tester profiles with Stellar keypair wallets, UPI deposits, & feedback.
 - [x] **User Feedback Excel / CSV File**: Complete 50-user dataset exported to [`rotafi_50_testers_feedback.csv`](./public/rotafi_50_testers_feedback.csv).
 - [x] **Feedback Iteration Summary with Commit Links**: 3 feedback-driven features built with direct GitHub commit links documented.
-- [x] **Pitch Deck / Presentation Link**: *(Drafting Level 5 Pitch Deck)*
+- [x] **Pitch Deck / Presentation Link**: [View Interactive 10-Slide Pitch Deck](https://rota-fi-omega.vercel.app/pitch_deck.html)
 - [x] **Analytics & Monitoring Setup**: Sentry SDK + `@vercel/analytics` integrated.
