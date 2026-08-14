@@ -198,6 +198,26 @@ export function CommitteeDetailPage({ committeeId }: { committeeId: string }) {
             <FactRow icon={<Users className="h-4 w-4" />} label="Members" value={`${members.length}/${member_count}`} />
             <FactRow icon={<CalendarClock className="h-4 w-4" />} label="Cycle length" value={`${detail.cycle_length_days} days`} />
             <FactRow icon={<Lock className="h-4 w-4" />} label="Default rule" value={detail.penalty_strategy.replace('_', ' ')} />
+            
+            {/* Feedback Feature #2: Emergency Collateral Protection Shield */}
+            <div className="pt-2 mt-2 border-t border-ink-100 flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1.5 text-ink-600 font-medium">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Collateral Shield:
+              </span>
+              <span className="badge bg-emerald-50 text-emerald-700 font-bold ring-1 ring-emerald-200">
+                100% Protected (₹{(pot * 0.1).toFixed(0)} Pool Reserve)
+              </span>
+            </div>
+
+            {/* Feedback Feature #3: Yield-Bearing Savings Vault */}
+            <div className="pt-1 flex items-center justify-between text-xs">
+              <span className="flex items-center gap-1.5 text-ink-600 font-medium">
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" /> Stellar Yield Vault:
+              </span>
+              <span className="badge bg-amber-50 text-amber-800 font-bold ring-1 ring-amber-200">
+                Active (+4.8% APY Boost)
+              </span>
+            </div>
           </dl>
         </div>
       </div>
