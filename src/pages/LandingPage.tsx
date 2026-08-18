@@ -45,7 +45,7 @@ function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 grid-noise opacity-60" />
-      <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24 lg:px-8 lg:pb-28 lg:pt-28">
+      <div className="relative mx-auto max-w-[1600px] px-4 pb-20 pt-16 sm:px-6 sm:pt-24 lg:px-10 lg:pb-28 lg:pt-28">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="animate-slide-up">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold text-brand-700 ring-1 ring-brand-200 backdrop-blur">
@@ -256,20 +256,18 @@ function StellarRationale() {
       <div className="pointer-events-none absolute inset-0 opacity-20 grid-noise" style={{ color: 'rgba(255,255,255,0.1)' }} />
       <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-500/20 blur-3xl" />
       <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-sapphire-500/20 blur-3xl" />
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+      <div className="relative mx-auto max-w-[1600px] px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-400">Why Stellar</p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Not payments
-
-            ed onto a chain — the structural fix
+            Not payments tacked onto a chain — the structural fix
           </h2>
           <p className="mt-4 text-pretty text-ink-300">
             The trust and transparency problem chit funds have is structurally the problem smart
             contracts solve. This is not a payments app with a chain sticker on it.
           </p>
         </div>
-        <div className="mt-12 grid gap-5 md:grid-cols-2">
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {points.map((p) => (
             <div key={p.title} className="rounded-xl2 bg-white/5 p-6 ring-1 ring-white/10 backdrop-blur transition hover:bg-white/10">
               <div className="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-brand-400/20">
@@ -288,7 +286,7 @@ function StellarRationale() {
 function LiveCommittees({ committees, counts }: { committees: Committee[]; counts: Record<string, number> }) {
   const { navigate } = useApp();
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+    <section className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">Live on testnet</p>
@@ -298,7 +296,7 @@ function LiveCommittees({ committees, counts }: { committees: Committee[]; count
           Explore all <ArrowRight className="h-4 w-4" />
         </button>
       </div>
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {committees.map((c) => (
           <CommitteeCard key={c.id} committee={c} memberCount={counts[c.id]} />
         ))}
@@ -315,7 +313,7 @@ function ForWhom() {
   ];
   return (
     <section className="border-t border-ink-200/70 bg-white/60">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+      <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-sapphire-600">Who it's for</p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">Built for the people already doing this</h2>
@@ -343,7 +341,7 @@ function FAQ() {
     { q: 'What\'s the long-term differentiator?', a: 'A portable on-chain contribution history — a lightweight trust score members carry between committees. Today no such history exists; your clean record in one group is invisible to the next.' },
   ];
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+    <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-10 lg:py-20">
       <div className="text-center">
         <p className="text-sm font-semibold uppercase tracking-wide text-brand-600">FAQ</p>
         <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">Common questions</h2>
@@ -377,7 +375,7 @@ function Testimonials() {
   if (feedbacks.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 lg:px-10">
       <div className="text-center max-w-2xl mx-auto mb-10">
         <span className="badge bg-brand-50 text-brand-700 ring-1 ring-brand-200">
           <MessageSquare className="h-3 w-3 mr-1" /> Community Reviews

@@ -38,7 +38,7 @@ function Footer() {
   const { navigate } = useApp();
   return (
     <footer className="border-t border-ink-200/70 bg-white/60">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-4 py-10 sm:px-6 lg:px-10">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex flex-col items-center gap-3 sm:items-start">
             <Logo />

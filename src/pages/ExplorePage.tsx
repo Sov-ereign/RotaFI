@@ -50,7 +50,7 @@ export function ExplorePage() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-ink-900">Explore committees</h1>
@@ -79,41 +79,47 @@ export function ExplorePage() {
               onClick={() => setTab(t.key)}
               className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                 tab === t.key
-                  ? 'bg-ink-900 text-white shadow-soft'
-                  : 'bg-white text-ink-600 ring-1 ring-inset ring-ink-200 hover:bg-ink-50'
+                  ? 'bg-ink-900 text-white shadow-soft font-semibold'
+                  : 'bg-white text-ink-600 ring-1 ring-ink-200 hover:bg-ink-50 hover:text-ink-900'
               }`}
             >
-              {t.label}
-              <span className={`rounded-full px-1.5 text-[10px] ${tab === t.key ? 'bg-white/20' : 'bg-ink-100 text-ink-500'}`}>{n}</span>
+              <span>{t.label}</span>
+              <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${tab === t.key ? 'bg-ink-700 text-white' : 'bg-ink-100 text-ink-500'}`}>
+                {n}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {loading ? (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2, 3, 4, 5].map((i) => <div key={i} className="card h-56 animate-pulse p-5" />)}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="mt-6 card">
-          <EmptyState
-            icon={<Compass className="h-7 w-7" />}
-            title="No committees found"
-            description={query ? 'Try a different search or filter.' : 'Be the first to create a committee on the testnet.'}
-          />
-        </div>
-      ) : (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((c) => (
-            <CommitteeCard
-              key={c.id}
-              committee={c}
-              memberCount={counts[c.id]}
-              isOrganizer={identity?.publicKey === c.organizer_wallet}
+      <div className="mt-6">
+        {loading ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="card p-5"><div className="skeleton h-4 w-3/4" /><div className="skeleton mt-2 h-3 w-1/2" /><div className="skeleton mt-6 h-12" /></div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="card">
+            <EmptyState
+              icon={<Compass className="h-7 w-7" />}
+              title="No committees found"
+              description={query ? 'Try a different search term or clear filters.' : 'Be the first to create one!'}
             />
-          ))}
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((c) => (
+              <CommitteeCard
+                key={c.id}
+                committee={c}
+                memberCount={counts[c.id]}
+                isOrganizer={identity?.publicKey === c.organizer_wallet}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="mt-10 flex items-center justify-center gap-2 text-xs text-ink-400">
         <Users2 className="h-4 w-4" />

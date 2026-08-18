@@ -68,7 +68,7 @@ export function CreateCommitteePage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-10">
       <button onClick={() => navigate({ name: 'dashboard' })} className="btn-ghost btn-sm mb-4">
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </button>
