@@ -1,5 +1,6 @@
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
+import { NetworkTicker } from './components/NetworkTicker';
 import { Toaster } from './components/Toaster';
 import { Logo } from './components/Logo';
 import { LandingPage } from './pages/LandingPage';
@@ -89,6 +90,7 @@ function Router() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <NetworkTicker />
       <Header />
       <main className="flex-1">{page}</main>
       <Footer />

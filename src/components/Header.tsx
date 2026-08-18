@@ -1,12 +1,14 @@
 import { useApp } from '../context/AppContext';
 import { Logo } from './Logo';
 import { WalletBar } from './WalletBar';
-import { Compass, LayoutDashboard, PlusCircle, MessageSquare, ExternalLink, Menu, X } from 'lucide-react';
+import { Compass, LayoutDashboard, PlusCircle, MessageSquare, ExternalLink, Menu, X, Calculator } from 'lucide-react';
 import { useState } from 'react';
+import { YieldCalculatorModal } from './YieldCalculatorModal';
 
 export function Header() {
   const { route, navigate, identity } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [yieldModalOpen, setYieldModalOpen] = useState(false);
 
   const navItems: { label: string; route: Parameters<typeof navigate>[0]; show: boolean; icon: any }[] = [
     { label: 'Explore', route: { name: 'explore' }, show: true, icon: Compass },
@@ -50,6 +52,15 @@ export function Header() {
 
         {/* Right Action Bar */}
         <div className="flex items-center gap-3">
+          {/* Yield Calculator Button */}
+          <button
+            onClick={() => setYieldModalOpen(true)}
+            className="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-50 to-emerald-50 px-3 py-1 text-[11px] font-bold text-ink-900 ring-1 ring-amber-200/80 transition hover:scale-105 shadow-sm"
+          >
+            <Calculator className="h-3.5 w-3.5 text-amber-500" />
+            Yield Calculator
+          </button>
+
           {/* Stellar Testnet Pill */}
           <a
             href="https://stellar.org/testnet"
@@ -100,6 +111,9 @@ export function Header() {
           })}
         </div>
       )}
+
+      {/* Yield & APY Calculator Modal */}
+      <YieldCalculatorModal open={yieldModalOpen} onClose={() => setYieldModalOpen(false)} />
     </header>
   );
 }
