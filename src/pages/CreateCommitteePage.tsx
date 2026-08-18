@@ -67,23 +67,27 @@ export function CreateCommitteePage() {
     }
   };
 
+  const totalPot = amount * memberCount;
+
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-10">
-      <button onClick={() => navigate({ name: 'dashboard' })} className="btn-ghost btn-sm mb-4">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-10 space-y-6">
+      <button onClick={() => navigate({ name: 'dashboard' })} className="btn-ghost btn-sm">
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </button>
 
-      <h1 className="font-display text-2xl font-bold text-ink-900">Create a committee</h1>
-      <p className="mt-1 text-sm text-ink-500">Set up a transparent rotating savings group on Stellar.</p>
+      <div>
+        <h1 className="font-display text-3xl font-extrabold text-ink-900 tracking-tight">Create a ROSCA Committee</h1>
+        <p className="mt-1 text-sm text-ink-500">Configure a transparent rotating savings group enforced by Soroban smart contract logic.</p>
+      </div>
 
       {/* Stepper */}
-      <div className="mt-6 flex items-center gap-2">
+      <div className="flex items-center gap-2 rounded-2xl bg-white p-4 ring-1 ring-ink-200/80 shadow-soft">
         {steps.map((s, i) => (
           <div key={s} className="flex flex-1 items-center gap-2">
             <div
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition ${
                 i < step
-                  ? 'bg-brand-600 text-white'
+                  ? 'bg-brand-600 text-white shadow-soft'
                   : i === step
                     ? 'bg-ink-900 text-white ring-4 ring-ink-900/10'
                     : 'bg-ink-100 text-ink-400'
@@ -91,13 +95,14 @@ export function CreateCommitteePage() {
             >
               {i < step ? <Check className="h-4 w-4" /> : i + 1}
             </div>
-            <span className={`hidden text-xs font-semibold sm:block ${i === step ? 'text-ink-900' : 'text-ink-400'}`}>{s}</span>
+            <span className={`hidden text-xs font-semibold sm:block ${i === step ? 'text-ink-900 font-bold' : 'text-ink-400'}`}>{s}</span>
             {i < steps.length - 1 && <div className={`h-0.5 flex-1 rounded ${i < step ? 'bg-brand-500' : 'bg-ink-200'}`} />}
           </div>
         ))}
       </div>
 
-      <div className="mt-6 card p-6">
+      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+        <div className="card p-6 border border-ink-200/80 shadow-soft">
         {step === 0 && (
           <div className="animate-fade-in space-y-5">
             <div>
@@ -241,25 +246,65 @@ export function CreateCommitteePage() {
             <ReviewRow label="Organizer" value={`${identity.name} (you)`} />
           </div>
         )}
+
+        {/* Nav buttons */}
+        <div className="mt-6 flex items-center justify-between pt-4 border-t border-ink-150">
+          <button
+            className="btn-ghost btn-sm"
+            onClick={() => (step === 0 ? navigate({ name: 'dashboard' }) : setStep((s) => s - 1))}
+          >
+            <ArrowLeft className="h-4 w-4" /> {step === 0 ? 'Cancel' : 'Back'}
+          </button>
+          {step < steps.length - 1 ? (
+            <button className="btn-primary btn-sm rounded-full shadow-soft" disabled={!canNext()} onClick={() => setStep((s) => s + 1)}>
+              Continue <ArrowRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button className="btn-primary btn-sm rounded-full shadow-soft" disabled={submitting} onClick={submit}>
+              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Deploying on Soroban…</> : <><Sparkles className="h-4 w-4" /> Deploy Committee Contract</>}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Nav buttons */}
-      <div className="mt-5 flex items-center justify-between">
-        <button
-          className="btn-ghost btn-sm"
-          onClick={() => (step === 0 ? navigate({ name: 'dashboard' }) : setStep((s) => s - 1))}
-        >
-          <ArrowLeft className="h-4 w-4" /> {step === 0 ? 'Cancel' : 'Back'}
-        </button>
-        {step < steps.length - 1 ? (
-          <button className="btn-primary btn-sm" disabled={!canNext()} onClick={() => setStep((s) => s + 1)}>
-            Continue <ArrowRight className="h-4 w-4" />
-          </button>
-        ) : (
-          <button className="btn-primary btn-sm" disabled={submitting} onClick={submit}>
-            {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Deploying…</> : <><Sparkles className="h-4 w-4" /> Create committee</>}
-          </button>
-        )}
+      {/* Live Pot Preview Sidebar */}
+      <div className="space-y-4">
+        <div className="card p-6 bg-gradient-to-br from-slate-900 via-ink-900 to-slate-950 text-white shadow-lift border border-slate-800 backdrop-blur-xl relative overflow-hidden">
+          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
+          <div className="space-y-3 relative z-10">
+            <span className="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] uppercase font-bold">
+              Live Pot Preview
+            </span>
+            <div>
+              <div className="text-xs text-slate-400 font-semibold">Total Pool Vault per Cycle</div>
+              <div className="font-display text-3xl font-extrabold text-white mt-0.5">
+                ₹{(totalPot * 10).toLocaleString()} INR
+              </div>
+              <div className="text-xs text-emerald-400 font-mono mt-0.5">({totalPot.toLocaleString()} XLM)</div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800 space-y-2 text-xs">
+              <div className="flex items-center justify-between text-slate-300">
+                <span>Members</span>
+                <span className="font-bold text-white">{memberCount}</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-300">
+                <span>Cycle Length</span>
+                <span className="font-bold text-white">{cycleDays} Days</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-300">
+                <span>Payout Rule</span>
+                <span className="font-bold text-amber-400 uppercase text-[10px]">{payoutRule.replace('_', ' ')}</span>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-slate-800/80 p-3 text-[11px] text-slate-400 leading-relaxed border border-slate-700/60">
+              <ShieldCheck className="h-4 w-4 text-emerald-400 inline mr-1" />
+              Soroban smart contract automatically collects contributions and releases funds each cycle.
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
     </div>
   );

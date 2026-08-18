@@ -153,8 +153,8 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="font-display text-2xl font-bold text-ink-900 mb-8">My Profile</h1>
+    <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10 space-y-8">
+      <h1 className="font-display text-3xl font-extrabold text-ink-900 tracking-tight">Account Profile & Trust Score</h1>
 
       <div className="grid gap-6 lg:grid-cols-3">
 

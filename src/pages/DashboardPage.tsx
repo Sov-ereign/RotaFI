@@ -44,94 +44,116 @@ export function DashboardPage() {
   const seed = identity.publicKey || identity.email;
 
   return (
-    <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10">
-      {/* Wallet summary */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-        <div className="card relative overflow-hidden p-6">
-          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-brand-100/60 blur-2xl" />
-          <div className="relative">
-            <div className="flex items-center gap-3">
-              <span
-                className="grid h-12 w-12 place-items-center rounded-xl text-base font-bold text-white shadow-soft"
-                style={{ background: avatarGradient(seed) }}
-              >
-                {initials(identity.name)}
-              </span>
-              <div className="min-w-0">
-                <div className="font-display text-lg font-bold text-ink-900">{identity.name}</div>
-                <div className="font-mono text-xs text-ink-400">
-                  {identity.publicKey ? shortAddress(identity.publicKey, 8, 6) : identity.email}
+    <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10 space-y-8">
+      {/* Dark Glassmorphic Wallet Summary Banner */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+        <div className="card relative overflow-hidden p-6 bg-gradient-to-br from-slate-900 via-ink-900 to-slate-950 text-white shadow-lift border border-slate-800 backdrop-blur-xl">
+          <div className="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="absolute -left-12 -bottom-12 h-44 w-44 rounded-full bg-sky-500/10 blur-3xl" />
+
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3.5">
+                <span
+                  className="grid h-12 w-12 place-items-center rounded-2xl text-base font-bold text-white shadow-md ring-2 ring-white/20"
+                  style={{ background: avatarGradient(seed) }}
+                >
+                  {initials(identity.name)}
+                </span>
+                <div className="min-w-0">
+                  <div className="font-display text-xl font-extrabold text-white flex items-center gap-2">
+                    {identity.name}
+                    <span className="badge bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30 text-[10px]">
+                      Verified Member
+                    </span>
+                  </div>
+                  <div className="font-mono text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                    {identity.publicKey ? shortAddress(identity.publicKey, 8, 6) : identity.email}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-xs font-medium text-ink-400">
-              <span className="badge bg-sapphire-50 text-sapphire-700 ring-1 ring-sapphire-200">Stellar Testnet</span>
-              <span className="badge bg-ink-100 text-ink-600 ring-1 ring-ink-200">TESTINR</span>
+
+            <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="badge bg-slate-800 text-slate-300 ring-1 ring-slate-700">Stellar Testnet</span>
+                <span className="badge bg-emerald-950 text-emerald-300 ring-1 ring-emerald-800 font-mono">TESTINR</span>
+              </div>
+              <button
+                onClick={() => navigate({ name: 'profile' })}
+                className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition"
+              >
+                View Credit Profile <ArrowRight className="h-3 w-3" />
+              </button>
             </div>
           </div>
         </div>
 
+        {/* 4 Stat Cards */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard icon={<Coins className="h-5 w-5" />} label="Committees" value={`${committees.length}`} accent="brand" />
-          <StatCard icon={<TrendingUp className="h-5 w-5" />} label="Active" value={`${active.length}`} accent="sapphire" />
-          <StatCard icon={<Users className="h-5 w-5" />} label="Organizing" value={`${organized.length}`} accent="saffron" />
-          <StatCard icon={<Wallet className="h-5 w-5" />} label="Contributed" value={formatINRShort(totalContributed)} accent="brand" />
+          <StatCard icon={<Coins className="h-5 w-5 text-emerald-400" />} label="Committees" value={`${committees.length}`} accent="brand" />
+          <StatCard icon={<TrendingUp className="h-5 w-5 text-sky-400" />} label="Active" value={`${active.length}`} accent="sapphire" />
+          <StatCard icon={<Users className="h-5 w-5 text-amber-400" />} label="Organizing" value={`${organized.length}`} accent="saffron" />
+          <StatCard icon={<Wallet className="h-5 w-5 text-indigo-400" />} label="Contributed" value={formatINRShort(totalContributed)} accent="brand" />
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="mt-8 flex items-center justify-between">
-        <h2 className="font-display text-xl font-bold text-ink-900">My committees</h2>
-        <div className="flex gap-2">
-          <button className="btn-secondary btn-sm" onClick={() => window.location.reload()}>
+      {/* Actions & Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-ink-150 pb-4">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-ink-900">My ROSCA Committees</h2>
+          <p className="text-xs text-ink-500 mt-0.5">Manage your active savings circles, contributions, and distributions.</p>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <button className="btn-secondary btn-sm rounded-full" onClick={() => window.location.reload()}>
             <RotateCw className="h-3.5 w-3.5" /> Refresh
           </button>
-          <button className="btn-primary btn-sm" onClick={() => navigate({ name: 'create' })}>
-            <Plus className="h-4 w-4" /> New committee
+          <button className="btn-primary btn-sm rounded-full shadow-soft" onClick={() => navigate({ name: 'create' })}>
+            <Plus className="h-4 w-4" /> New Committee
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2].map((i) => <div key={i} className="card h-56 animate-pulse p-5" />)}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => <div key={i} className="card h-56 animate-pulse p-5 bg-ink-50" />)}
         </div>
       ) : committees.length === 0 ? (
-        <div className="mt-6 card">
+        <div className="card">
           <EmptyState
-            icon={<Sparkles className="h-7 w-7" />}
-            title="No committees yet"
-            description="Start your first rotating savings committee, or join one from the explore page."
+            icon={<Sparkles className="h-7 w-7 text-brand-500" />}
+            title="No committees joined yet"
+            description="Start your first rotating savings committee or browse live ones on the explore marketplace."
             action={
-              <div className="flex gap-2">
-                <button className="btn-primary btn-sm" onClick={() => navigate({ name: 'create' })}>
-                  <Plus className="h-4 w-4" /> Create a committee
+              <div className="flex gap-2.5">
+                <button className="btn-primary btn-sm rounded-full shadow-soft" onClick={() => navigate({ name: 'create' })}>
+                  <Plus className="h-4 w-4" /> Create Committee
                 </button>
-                <button className="btn-secondary btn-sm" onClick={() => navigate({ name: 'explore' })}>
-                  Explore <ArrowRight className="h-4 w-4" />
+                <button className="btn-secondary btn-sm rounded-full" onClick={() => navigate({ name: 'explore' })}>
+                  Explore Marketplace <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             }
           />
         </div>
       ) : (
-        <div className="mt-6 space-y-8">
+        <div className="space-y-8">
           {active.length > 0 && (
-            <Section title="Active" count={active.length}>
+            <Section title="Active Committees" count={active.length}>
               {active.map((c) => (
                 <CommitteeCard key={c.id} committee={c} memberCount={counts[c.id]} isOrganizer={c.organizer_wallet === identity.publicKey} />
               ))}
             </Section>
           )}
           {forming.length > 0 && (
-            <Section title="Forming" count={forming.length}>
+            <Section title="Forming Committees" count={forming.length}>
               {forming.map((c) => (
                 <CommitteeCard key={c.id} committee={c} memberCount={counts[c.id]} isOrganizer={c.organizer_wallet === identity.publicKey} />
               ))}
             </Section>
           )}
           {completed.length > 0 && (
-            <Section title="Completed" count={completed.length}>
+            <Section title="Completed Committees" count={completed.length}>
               {completed.map((c) => (
                 <CommitteeCard key={c.id} committee={c} memberCount={counts[c.id]} isOrganizer={c.organizer_wallet === identity.publicKey} />
               ))}
@@ -146,10 +168,10 @@ export function DashboardPage() {
 function Section({ title, count, children }: { title: string; count: number; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ink-400">
-        {title} <span className="rounded-full bg-ink-100 px-2 py-0.5 text-xs text-ink-500">{count}</span>
+      <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink-500">
+        {title} <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700 font-extrabold">{count}</span>
       </h3>
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{children}</div>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{children}</div>
     </div>
   );
 }
