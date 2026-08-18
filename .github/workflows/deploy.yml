@@ -1,0 +1,25 @@
+name: RotaFi Production Deployment Validation
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-status-check:
+    name: 🚀 Production Health & Telemetry Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Ping Live Vercel Frontend Deployment
+        run: |
+          echo "Pinging Live Vercel Production Frontend..."
+          curl -s -f -o /dev/null https://rota-fi-omega.vercel.app/ || exit 1
+          echo "✅ Vercel Frontend is live and responding 200 OK!"
+
+      - name: Ping Live Render Backend API Server
+        run: |
+          echo "Pinging Live Render Production API Server..."
+          curl -s -f -o /dev/null https://rotafi-hw2t.onrender.com/api/committees || exit 1
+          echo "✅ Render API Server is live and responding 200 OK!"

@@ -30,6 +30,8 @@ Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed or
 * **Demo Video Walkthrough**: [Watch Video on YouTube](https://youtu.be/7MvsmhCuuSM)
 * **Backend API Server**: [https://rotafi-hw2t.onrender.com/api](https://rotafi-hw2t.onrender.com/api)
 * **Stellar Testnet Contract ID**: [`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`](https://lab.stellar.org/r/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
+* **Automated CI/CD Pipeline**: [GitHub Actions Workflow](./.github/workflows/ci.yml)
+* **Brand Asset Kit & Guidelines**: [View BRANDING.md](./BRANDING.md)
 * **Stellar Expert Explorer**: [View Contract on Explorer](https://stellar.expert/explorer/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
 
 ---

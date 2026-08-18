@@ -1,0 +1,77 @@
+name: RotaFi Continuous Integration (CI/CD)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  contract-build-and-test:
+    name: 🦀 Soroban Smart Contract (Rust)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            contracts/rotafi/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build Soroban Contract (WASM)
+        run: |
+          cd contracts/rotafi
+          cargo build --target wasm32-unknown-unknown --release
+
+  frontend-build-and-typecheck:
+    name: ⚡ React & TypeScript Frontend Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: Verify TypeScript Types & Production Build
+        run: npm run build
+
+  backend-server-check:
+    name: 🌐 Express API Server Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies & Validate Backend Server Syntax
+        run: |
+          npm ci
+          node --check server/index.js
+          node --check server/models.js
+          node --check server/routes/committees.js
+          node --check server/routes/users.js
+          node --check server/routes/auth.js

@@ -15,6 +15,7 @@ import { ProgressRing } from '../components/ProgressRing';
 import { Modal } from '../components/Modal';
 import { StatusBadge, ContributionBadge, PayoutBadge } from '../components/Badges';
 import { EmptyState } from '../components/EmptyState';
+import { CycleRotationWheel } from '../components/CycleRotationWheel';
 
 export function CommitteeDetailPage({ committeeId }: { committeeId: string }) {
   const { identity, navigate, toast } = useApp();
@@ -188,6 +189,9 @@ export function CommitteeDetailPage({ committeeId }: { committeeId: string }) {
             </div>
           </div>
         </div>
+
+        {/* Interactive Soroban Cycle Rotation Wheel Visualizer */}
+        <CycleRotationWheel committee={detail} members={members} />
 
         {/* Key facts */}
         <div className="card p-6">
