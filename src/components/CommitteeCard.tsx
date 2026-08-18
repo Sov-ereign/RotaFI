@@ -21,32 +21,37 @@ export function CommitteeCard({ committee, memberCount, isOrganizer }: Committee
   return (
     <button
       onClick={() => navigate({ name: 'committee', id: committee.id })}
-      className="card-hover group flex w-full flex-col p-5 text-left"
+      className="card-hover group flex w-full flex-col p-5 text-left bg-white/90 backdrop-blur-md border border-ink-200/80 shadow-soft hover:shadow-lift hover:border-brand-400/40 transition-all duration-300 relative overflow-hidden"
     >
-      <div className="flex items-start justify-between gap-3">
+      {/* Glow highlight on hover */}
+      <div className="absolute top-0 right-0 h-24 w-24 rounded-full bg-gradient-to-br from-brand-400/10 to-sapphire-400/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+      <div className="flex items-start justify-between gap-3 relative z-10">
         <div className="min-w-0">
-          <h3 className="truncate font-display text-base font-bold text-ink-900">{committee.name}</h3>
-          <p className="mt-0.5 line-clamp-1 text-xs text-ink-500">
-            {committee.description || `By ${committee.organizer_name}`}
+          <h3 className="truncate font-display text-base font-bold text-ink-900 group-hover:text-brand-600 transition-colors">
+            {committee.name}
+          </h3>
+          <p className="mt-0.5 line-clamp-1 text-xs text-ink-500 font-medium">
+            {committee.description || `Organized by ${committee.organizer_name}`}
           </p>
         </div>
         <StatusBadge status={committee.status} />
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <Stat label="Contribution" value={formatINRShort(committee.contribution_amount)} icon={<TrendingUp className="h-3.5 w-3.5" />} />
-        <Stat label="Members" value={`${fillCount}/${committee.member_count}`} icon={<Users className="h-3.5 w-3.5" />} />
-        <Stat label="Pot / cycle" value={formatINRShort(pot)} icon={<Calendar className="h-3.5 w-3.5" />} />
+      <div className="mt-4 grid grid-cols-3 gap-2 relative z-10">
+        <Stat label="Contribution" value={formatINRShort(committee.contribution_amount)} icon={<TrendingUp className="h-3.5 w-3.5 text-brand-500" />} />
+        <Stat label="Members" value={`${fillCount}/${committee.member_count}`} icon={<Users className="h-3.5 w-3.5 text-sapphire-500" />} />
+        <Stat label="Pot / cycle" value={formatINRShort(pot)} icon={<Calendar className="h-3.5 w-3.5 text-amber-500" />} />
       </div>
 
-      <div className="mt-4">
-        <div className="mb-1.5 flex items-center justify-between text-[11px] font-medium text-ink-400">
+      <div className="mt-4 relative z-10">
+        <div className="mb-1.5 flex items-center justify-between text-[11px] font-semibold text-ink-500">
           <span>{committee.status === 'forming' ? 'Members joined' : 'Cycle progress'}</span>
-          <span>{committee.status === 'forming' ? `${fillPct}%` : `${Math.round(cycleProgress * 100)}%`}</span>
+          <span className="font-bold text-brand-600">{committee.status === 'forming' ? `${fillPct}%` : `${Math.round(cycleProgress * 100)}%`}</span>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-ink-100">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-ink-150/70 p-0.5">
           <div
-            className="h-full rounded-full gradient-brand transition-all duration-700"
+            className="h-full rounded-full gradient-brand transition-all duration-700 shadow-sm"
             style={{ width: `${(committee.status === 'forming' ? fillPct / 100 : cycleProgress) * 100}%` }}
           />
         </div>

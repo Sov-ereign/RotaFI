@@ -93,72 +93,85 @@ function HeroVisual() {
   const members = [
     { name: 'Priya', pos: 1, paid: true, recv: false, color: 'from-brand-400 to-brand-600' },
     { name: 'Arjun', pos: 2, paid: true, recv: false, color: 'from-sapphire-400 to-sapphire-600' },
-    { name: 'Meena', pos: 3, paid: true, recv: true, color: 'from-saffron-400 to-saffron-600' },
-    { name: 'Ravi', pos: 4, paid: false, recv: false, color: 'from-danger-400 to-danger-600' },
-    { name: 'Divya', pos: 5, paid: true, recv: false, color: 'from-brand-500 to-sapphire-500' },
+    { name: 'Meena', pos: 3, paid: true, recv: true, color: 'from-amber-400 to-amber-600' },
+    { name: 'Ravi', pos: 4, paid: false, recv: false, color: 'from-indigo-400 to-indigo-600' },
+    { name: 'Divya', pos: 5, paid: true, recv: false, color: 'from-emerald-500 to-sky-500' },
   ];
   return (
     <div className="relative">
-      <div className="card overflow-hidden p-0 shadow-lift">
-        <div className="flex items-center justify-between border-b border-ink-100 bg-ink-50/60 px-5 py-3.5">
-          <div>
-            <div className="font-display text-sm font-bold text-ink-900">Family Circle Committee</div>
-            <div className="text-[11px] text-ink-400">Cycle 3 of 5 · ₹2,000/cycle</div>
+      {/* Ambient background glow ring */}
+      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-brand-500 via-sapphire-500 to-indigo-500 opacity-20 blur-xl animate-pulse-glow" />
+
+      <div className="card overflow-hidden p-0 shadow-lift border border-ink-200/80 relative z-10 backdrop-blur-xl">
+        <div className="flex items-center justify-between border-b border-ink-100 bg-slate-900 px-5 py-4 text-white">
+          <div className="flex items-center gap-2.5">
+            <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <div>
+              <div className="font-display text-sm font-bold text-white">Bharat Savings Guild</div>
+              <div className="text-[11px] text-slate-400">Cycle 3 of 5 · ₹2,000/cycle</div>
+            </div>
           </div>
-          <span className="badge bg-brand-50 text-brand-700 ring-1 ring-brand-200">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500 animate-pulse-soft" /> Active
+          <span className="badge bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30 text-[10px] font-bold uppercase">
+            Soroban Testnet
           </span>
         </div>
-        <div className="p-5">
-          <div className="mb-4 flex items-center justify-between rounded-xl bg-gradient-to-br from-brand-50 to-sapphire-50 p-4 ring-1 ring-brand-100">
+
+        <div className="p-5 bg-gradient-to-b from-white to-ink-50/50">
+          <div className="mb-4 flex items-center justify-between rounded-xl bg-gradient-to-br from-slate-900 via-ink-900 to-slate-900 p-4 text-white shadow-md border border-slate-800">
             <div>
-              <div className="text-[11px] font-medium uppercase tracking-wide text-brand-700">This cycle's pot</div>
-              <div className="font-display text-2xl font-extrabold text-ink-900">₹10,000</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Active Pot Vault</div>
+              <div className="font-display text-2xl font-extrabold text-white">₹10,000 <span className="text-xs font-normal text-slate-400">(1,000 XLM)</span></div>
             </div>
             <div className="text-right">
-              <div className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Releases to</div>
-              <div className="flex items-center gap-1.5 font-semibold text-ink-900">
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-saffron-400 to-saffron-600 text-[10px] text-white">M</span>
-                Meena
+              <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Releases To</div>
+              <div className="flex items-center justify-end gap-1.5 font-semibold text-white mt-0.5">
+                <span className="grid h-6 w-6 place-items-center rounded-full bg-amber-500 text-[10px] font-bold text-ink-950">M</span>
+                Meena <span className="text-[10px] text-amber-300 font-normal">(Winning Bid)</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
             {members.map((m) => (
-              <div key={m.pos} className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition hover:bg-ink-50">
-                <span className={`grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br ${m.color} text-xs font-bold text-white`}>
+              <div key={m.pos} className="flex items-center gap-3 rounded-xl p-2 transition hover:bg-white hover:shadow-soft border border-transparent hover:border-ink-150">
+                <span className={`grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br ${m.color} text-xs font-bold text-white shadow-sm`}>
                   {m.name[0]}
                 </span>
-                <span className="flex-1 text-sm font-medium text-ink-800">{m.name}</span>
+                <span className="flex-1 text-sm font-semibold text-ink-900">{m.name}</span>
                 {m.recv ? (
-                  <span className="badge bg-saffron-50 text-saffron-700 ring-1 ring-saffron-200">Recipient</span>
+                  <span className="badge bg-amber-50 text-amber-800 ring-1 ring-amber-200 font-bold text-[10px]">
+                    ★ Winner (₹800 Rebate)
+                  </span>
                 ) : m.paid ? (
-                  <span className="badge bg-brand-50 text-brand-700 ring-1 ring-brand-200"><CheckCircle2 className="h-3 w-3" /> Paid</span>
+                  <span className="badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 text-[10px] font-semibold">
+                    <CheckCircle2 className="h-3 w-3" /> Paid
+                  </span>
                 ) : (
-                  <span className="badge bg-ink-100 text-ink-500 ring-1 ring-ink-200">Pending</span>
+                  <span className="badge bg-slate-100 text-slate-600 ring-1 ring-slate-200 text-[10px]">
+                    Pending
+                  </span>
                 )}
               </div>
             ))}
           </div>
 
-          <div className="mt-4">
-            <div className="mb-1.5 flex justify-between text-[11px] font-medium text-ink-400">
-              <span>Cycle progress</span><span>4 / 5 contributed</span>
+          <div className="mt-4 pt-3 border-t border-ink-150/70">
+            <div className="mb-1.5 flex justify-between text-[11px] font-semibold text-ink-600">
+              <span>Cycle Progress</span><span>4 of 5 Contributed</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-ink-100">
-              <div className="h-full w-4/5 rounded-full gradient-brand transition-all duration-700" />
+            <div className="h-2 w-full overflow-hidden rounded-full bg-ink-200/60 p-0.5">
+              <div className="h-full w-4/5 rounded-full gradient-brand transition-all duration-700 shadow-sm" />
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-ink-100 bg-ink-50/60 px-5 py-3">
-          <span className="font-mono text-[11px] text-ink-400">c3 · tx 0x4a…f2e1</span>
-          <span className="flex items-center gap-1 text-[11px] font-semibold text-brand-600">
-            <Lock className="h-3 w-3" /> Contract-enforced
+
+        <div className="flex items-center justify-between border-t border-ink-100 bg-slate-900 px-5 py-3 text-slate-300">
+          <span className="font-mono text-[10px] text-slate-400">c3 · tx 0x4a…f2e1</span>
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-400">
+            <Lock className="h-3 w-3" /> Smart Contract Verified
           </span>
         </div>
       </div>
-      <div className="absolute -bottom-3 -right-3 -z-10 h-full w-full rounded-xl2 bg-gradient-to-br from-brand-200/40 to-sapphire-200/30 blur-2xl" />
     </div>
   );
 }
