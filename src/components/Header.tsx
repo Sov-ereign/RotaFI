@@ -20,7 +20,7 @@ export function Header() {
   const isActive = (name: string) => route.name === name;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-200/80 bg-white/80 backdrop-blur-xl shadow-soft">
+    <header className="sticky top-0 z-40 border-b border-ink-200/90 bg-white/90 backdrop-blur-2xl shadow-[0_4px_25px_rgba(0,0,0,0.04)]">
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-10">
         
         {/* Brand Logo */}
