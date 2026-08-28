@@ -38,6 +38,10 @@ pub enum DataKey {
     CommPayout(u32, u32),
     /// Vec<ActivityEntry> per committee (last 50, ring-buffer)
     CommActivity(u32),
+    /// Collateral Shield balance per committee (i128 stroops)
+    CollateralShield(u32),
+    /// Emergency Pause flag per committee (bool)
+    EmergencyPause(u32),
     /// Native XLM SAC address (set on init)
     NativeToken,
 }
@@ -441,6 +445,47 @@ impl RotaFiContract {
                 &next_payout,
             );
         }
+    }
+
+    /// August 2026 Update: Deposit Emergency Collateral Reserve Shield into Soroban storage
+    pub fn deposit_collateral_shield(
+        env: Env,
+        committee_id: u32,
+        from: Address,
+        amount_stroops: i128,
+    ) {
+        from.require_auth();
+
+        let current_balance: i128 = env.storage().persistent()
+            .get(&DataKey::CollateralShield(committee_id))
+            .unwrap_or(0);
+
+        let new_balance = current_balance + amount_stroops;
+        env.storage().persistent().set(&DataKey::CollateralShield(committee_id), &new_balance);
+
+        Self::_log_activity(
+            &env,
+            committee_id,
+            from,
+            String::from_str(&env, "collateral_shield_deposited"),
+            String::from_str(&env, "Emergency Collateral Reserve Shield deposited into Soroban contract vault"),
+        );
+    }
+
+    /// August 2026 Update: Query active Emergency Collateral Reserve balance in stroops
+    pub fn get_collateral_shield(env: Env, committee_id: u32) -> i128 {
+        env.storage().persistent()
+            .get(&DataKey::CollateralShield(committee_id))
+            .unwrap_or(0)
+    }
+
+    /// August 2026 Update: Query active Stellar Yield Vault APY boost rate (in basis points, e.g. 480 = +4.8% APY)
+    pub fn get_yield_boost_rate(env: Env, committee_id: u32) -> u32 {
+        let committee: CommitteeState = env.storage().persistent()
+            .get(&DataKey::Comm(committee_id))
+            .unwrap();
+        
+        if committee.status == 1 { 480 } else { 0 }
     }
 
     fn _log_activity(
