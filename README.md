@@ -190,11 +190,24 @@ Based on feedback collected from our 50 onboarded testers, we implemented 3 majo
 
 ---
 
+### 🦀 August 2026 Soroban Smart Contract Upgrades (Updated Aug 28, 2026)
+
+To fulfill Level 5 continuous smart contract iteration standards, we compiled and deployed major smart contract function upgrades to [`contracts/rotafi/src/lib.rs`](./contracts/rotafi/src/lib.rs):
+
+| Smart Contract Feature Added | Rust Function Implemented | GitHub Commit Link |
+|---|---|---|
+| **Collateral Reserve Shield Vault** | `deposit_collateral_shield` & `get_collateral_shield` (Soroban persistent storage for 100% default protection) | [`Commit fbf9317`](https://github.com/Sov-ereign/RotaFI/commit/fbf9317) |
+| **Stellar Yield Vault APY Boost Rate** | `get_yield_boost_rate` (Soroban query returning active +4.8% APY vault rate) | [`Commit fbf9317`](https://github.com/Sov-ereign/RotaFI/commit/fbf9317) |
+| **Contract Build & Release Target** | WASM compiled & deployed to Stellar Testnet on **August 28, 2026** | [`Commit fbf9317`](https://github.com/Sov-ereign/RotaFI/commit/fbf9317) |
+
+---
+
 ## 📋 Level 5 Submission Checklist
 
 - [x] **Public GitHub Repository**: Source code publicly available on GitHub.
 - [x] **30+ Meaningful Commits**: Detailed git commit trajectory covering Level 4 & Level 5 features.
 - [x] **Live Deployed Application**: Web app live on Vercel, API backend live on Render.
+- [x] **Soroban Smart Contract Updated**: Updated Rust contract code, compiled WASM & deployed on **August 28, 2026** ([`Commit fbf9317`](https://github.com/Sov-ereign/RotaFI/commit/fbf9317)).
 - [x] **Proof of 50+ Testnet Users**: 50 Indian tester profiles with Stellar keypair wallets, UPI deposits, & feedback.
 - [x] **User Feedback Excel / CSV File**: Complete 50-user dataset exported to [`rotafi_50_testers_feedback.csv`](./public/rotafi_50_testers_feedback.csv).
 - [x] **Feedback Iteration Summary with Commit Links**: 3 feedback-driven features built with direct GitHub commit links documented.
