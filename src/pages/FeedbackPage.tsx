@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MessageSquare, Star, Plus, ThumbsUp, ShieldCheck, Heart } from 'lucide-react';
+import { MessageSquare, Star, Plus, ThumbsUp, ShieldCheck, Heart, Send } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { fetchFeedbackList } from '../lib/contract';
 import type { FeedbackItem } from '../lib/types';
