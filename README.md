@@ -26,8 +26,9 @@ Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed or
 ## 🔗 Live Deployments & Contracts
 
 * **Frontend Web App**: [https://rota-fi-omega.vercel.app](https://rota-fi-omega.vercel.app)
+* **🎨 Interactive Dual-Theme Visual System**: Features **Aura Dark Theme (Moon 🌙 - Default)** and **Classic Light Theme (Sun ☀️)** with smooth circular ripple theme toggles, video backdrop, and liquid glass architecture.
 * **Level 5 Pitch Deck Presentation**: [View 10-Slide Pitch Deck](https://rota-fi-omega.vercel.app/pitch_deck.html)
-* **Demo Video Walkthrough**: [Watch Video on YouTube](https://youtu.be/7MvsmhCuuSM)
+* **Demo Video Walkthrough**: [Watch Aura Dark Theme Showcase on YouTube](https://youtu.be/iiPm1L0EC-U)
 * **Backend API Server**: [https://rotafi-hw2t.onrender.com/api](https://rotafi-hw2t.onrender.com/api)
 * **Stellar Testnet Contract ID**: [`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`](https://lab.stellar.org/r/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
 * **Automated CI/CD Pipeline**: [GitHub Actions Workflow](./.github/workflows/ci.yml)
@@ -41,7 +42,7 @@ Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed or
 | Layer | Technology | Purpose |
 |---|---|---|
 | **Frontend** | React 18 + TypeScript | SPA built using Vite 5 |
-| **Styling** | Tailwind CSS 3 | Fully responsive UI with micro-animations & dark accents |
+| **Styling** | Tailwind CSS 3 | Fully responsive UI with micro-animations & Aura Dark liquid glass |
 | **Wallet** | Freighter API v1.7.x | Browser extension wallet connection & transaction signing |
 | **Backend API** | Node.js + Express | REST API server for user authentication & indexing |
 | **Database** | MongoDB Atlas | Stores user profiles, bids, anchor transfers, & activity logs |
@@ -146,24 +147,69 @@ bash contracts/deploy.sh
 
 ---
 
-## 📸 Product Screenshots
+## 📸 Product Screenshots & Dual-Theme Visual System
 
-### 1. 🌐 Landing Page & Live Committee Explorer
-![Landing Page & Live Committees](./public/landing_page.png)
+### 1. 🌐 Landing Hero Page (Aura Dark Moon Theme 🌙 Default vs Classic Light Sun Theme ☀️)
+![Landing Page Aura Dark Moon Theme](./public/landing_page_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
 
----
-
-### 2. 👤 Account Profile, Credit Trust Gauge & Reviews
-![Profile Page, Credit Trust Score & Feedback](./public/profile.png)
-
----
-
-### 3. 📱 Mobile Responsive Interface & Design
-![Mobile Responsiveness](./public/mobile_responsiveness_ss.png)
+![Landing Page Classic Light Sun Theme](./public/landing_page.png)
+*Classic Light (Sun Theme ☀️)*
 
 ---
 
-### 4. 📊 Vercel Telemetry & Production Analytics
+### 2. 📊 Executive Financial Telemetry Dashboard
+![Executive Verdict Dashboard Aura Dark Moon Theme](./public/dashboard_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
+
+![Executive Verdict Dashboard Classic Light Sun Theme](./public/dashboard.png)
+*Classic Light (Sun Theme ☀️)*
+
+---
+
+### 3. 👤 Bento Box Profile & Credit Score Telemetry Gauge
+![Profile Page Aura Dark Moon Theme](./public/profile_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
+
+![Profile Page Classic Light Sun Theme](./public/profile.png)
+*Classic Light (Sun Theme ☀️)*
+
+---
+
+### 4. 🔄 ROSCA Cycle Rotation Wheel & Bidding Details
+![ROSCA Cycle Details Aura Dark Moon Theme](./public/view_circle_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
+
+![ROSCA Cycle Details Classic Light Sun Theme](./public/view_circle.png)
+*Classic Light (Sun Theme ☀️)*
+
+---
+
+### 5. 💬 Verified Community Feedback Board & Review Submission
+![Feedback Page Aura Dark Moon Theme](./public/feedback_page_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
+
+![Feedback Page Classic Light Sun Theme](./public/feedback_page.png)
+*Classic Light (Sun Theme ☀️)*
+
+---
+
+### 6. 🏛️ Statement Footer & Soroban Contract Explorer Link
+![RotaFi Statement Footer Aura Dark Moon Theme](./public/footer_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
+
+---
+
+### 7. 📱 Mobile Responsive Interface & Floating Pill Navigation
+![Mobile Responsiveness Aura Dark Moon Theme](./public/mobile_responsiveness_ss_moon.png)
+*Aura Dark (Moon Theme 🌙 Default)*
+
+![Mobile Responsiveness Classic Light Sun Theme](./public/mobile_responsiveness_ss.png)
+*Classic Light (Sun Theme ☀️)*
+
+---
+
+### 8. 📊 Vercel Telemetry & Production Analytics
 ![Vercel Analytics Dashboard](./public/vercel_analytics.png)
 
 ---
@@ -178,7 +224,7 @@ bash contracts/deploy.sh
 - [x] **Monitoring & Analytics**: Sentry SDK & `@vercel/analytics` integrated directly into React layout.
 - [x] **Proof of 10+ User Wallet Interactions**: 10 Indian tester profiles created with linked Stellar Testnet Keypairs, UPI deposits, committee contributions, and bidding auction interactions.
 - [x] **Basic User Feedback Summary**: Platform Feedback Modal & Community Reviews Board built; 10 tester ratings & reviews collected and displayed in-app.
-- [x] **Demo Video Link**: [Watch 2-Minute Video Walkthrough on YouTube](https://youtu.be/7MvsmhCuuSM)
+- [x] **Demo Video Link**: [Watch Aura Dark Theme Showcase Video on YouTube](https://youtu.be/iiPm1L0EC-U)
 
 ---
 

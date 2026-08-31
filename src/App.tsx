@@ -35,39 +35,10 @@ function PageFallback() {
   );
 }
 
-function Footer() {
-  const { navigate } = useApp();
-  return (
-    <footer className="border-t border-ink-200/70 bg-white/60">
-      <div className="mx-auto max-w-[1600px] px-4 py-10 sm:px-6 lg:px-10">
-        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-          <div className="flex flex-col items-center gap-3 sm:items-start">
-            <Logo />
-            <p className="max-w-xs text-center text-xs leading-relaxed text-ink-400 sm:text-left">
-              Transparent rotating savings groups on Stellar. MVP runs on testnet — no real money is at stake.
-            </p>
-          </div>
-          <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium text-ink-500">
-            <button onClick={() => navigate({ name: 'landing' })} className="transition hover:text-ink-900">Home</button>
-            <button onClick={() => navigate({ name: 'explore' })} className="transition hover:text-ink-900">Explore</button>
-            <button onClick={() => navigate({ name: 'dashboard' })} className="transition hover:text-ink-900">Dashboard</button>
-            <button onClick={() => navigate({ name: 'create' })} className="transition hover:text-ink-900">Create</button>
-          </nav>
-        </div>
-        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-ink-100 pt-6 text-xs text-ink-400 sm:flex-row">
-          <p>Built for the Stellar ecosystem · Soroban smart contracts</p>
-          <div className="flex items-center gap-1.5">
-            <Github className="h-3.5 w-3.5" />
-            <span>Open-source MVP</span>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
+import { Footer } from './components/Footer';
 
 function Router() {
-  const { route, ready } = useApp();
+  const { route, ready, theme } = useApp();
   if (!ready) {
     return (
       <div className="grid min-h-[60vh] place-items-center">
@@ -88,11 +59,46 @@ function Router() {
     default: page = <LandingPage />;
   }
 
+  const isLanding = route.name === 'landing';
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <NetworkTicker />
+    <div className={`flex min-h-screen flex-col transition-colors duration-300 ${
+      theme === 'dark' ? 'bg-[#0c0c0c] text-white' : 'bg-slate-50 text-slate-900'
+    }`}>
+      {theme === 'dark' && (
+        <>
+          {/* Fixed Fullscreen Background Video (Moon Theme) */}
+          <div className="fixed inset-0 z-0 pointer-events-none">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover pointer-events-none opacity-20"
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_064122_c4750c0e-7476-4b44-94a2-a85a65c63bf2.mp4"
+            />
+          </div>
+
+          {/* Vertical Guide Lines */}
+          <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 -translate-x-[calc(50%+36rem)] w-px bg-white/10 z-[5]" />
+          <div className="hidden md:block pointer-events-none fixed inset-y-0 left-1/2 translate-x-[calc(-50%+36rem)] w-px bg-white/10 z-[5]" />
+
+          {/* SVG Noise Filter */}
+          <svg className="pointer-events-none absolute w-0 h-0" aria-hidden="true">
+            <filter id="c3-noise">
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+              <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0" />
+              <feComposite in2="SourceGraphic" operator="in" result="noise" />
+              <feBlend in="SourceGraphic" in2="noise" mode="multiply" />
+            </filter>
+          </svg>
+        </>
+      )}
+
       <Header />
-      <main className="flex-1">{page}</main>
+      <main key={route.name} className={`relative z-10 flex-1 animate-page-enter ${isLanding ? 'pt-0' : 'pt-16'}`}>
+        {page}
+      </main>
       <Footer />
     </div>
   );

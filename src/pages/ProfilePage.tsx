@@ -3,7 +3,7 @@ import {
   User, Mail, Wallet, Shield, Edit2, Save, X, Loader2, ExternalLink,
   CalendarDays, Star, TrendingUp, Copy, Check, Link2Off, AlertCircle,
   Send, Landmark, History, ArrowUpDown, ShieldCheck, MessageSquare, Plus,
-  Zap, Activity, CreditCard, ChevronRight,
+  Zap, Activity, CreditCard, ChevronRight, Sparkles, Award, Settings, Layers
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { avatarGradient, initials, shortAddress, isFreighterSync } from '../lib/wallet';
@@ -12,13 +12,16 @@ import { fetchAnchorTransactions, createAnchorTransaction, fetchFeedbackList } f
 import type { Committee, AnchorTx, FeedbackItem } from '../lib/types';
 import { FeedbackModal } from '../components/FeedbackModal';
 
+type ProfileTab = 'overview' | 'committees' | 'fiat-gateway' | 'settings';
+
 interface ProfileStats {
   committeesCreated: number;
   committeesJoined: number;
 }
 
 export function ProfilePage() {
-  const { identity, updateProfile, linkWallet, unlinkWallet, navigate, toast, freighterInstalled, freighterChecking } = useApp();
+  const { identity, updateProfile, linkWallet, unlinkWallet, navigate, toast, freighterInstalled, freighterChecking, theme } = useApp();
+  const [activeTab, setActiveTab] = useState<ProfileTab>('overview');
   const [editing, setEditing] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [bioInput, setBioInput] = useState('');
@@ -27,7 +30,7 @@ export function ProfilePage() {
   const [copied, setCopied] = useState(false);
   const [myCommittees, setMyCommittees] = useState<Committee[]>([]);
   const [stats, setStats] = useState<ProfileStats | null>(null);
-  const [creditScore, setCreditScore] = useState(650);
+  const [creditScore, setCreditScore] = useState(715);
   const [anchorTxs, setAnchorTxs] = useState<AnchorTx[]>([]);
   const [anchorAmountInr, setAnchorAmountInr] = useState('');
   const [anchorAmountXlm, setAnchorAmountXlm] = useState('');
@@ -47,7 +50,7 @@ export function ProfilePage() {
       fetchAnchorTransactions(),
     ]).then(([profile, committees, txs]) => {
       setStats(profile.stats);
-      setCreditScore(profile.credit_score || 650);
+      setCreditScore(profile.credit_score || 715);
       setMyCommittees(committees);
       setAnchorTxs(txs);
     }).catch(() => {}).finally(() => setLoadingData(false));
@@ -60,10 +63,32 @@ export function ProfilePage() {
 
   if (!identity) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <h2 className="font-display text-2xl font-bold text-ink-900">Sign in to view your profile</h2>
-        <p className="mt-2 text-ink-500">Create an account or sign in to manage your committees.</p>
-        <button className="btn-primary mt-6" onClick={() => navigate({ name: 'landing' })}>Back to home</button>
+      <div className="mx-auto max-w-2xl px-4 py-24 text-center space-y-6">
+        <div className={`mx-auto grid h-16 w-16 place-items-center rounded-2xl ${
+          theme === 'dark' ? 'bg-slate-900 border border-white/10 text-white shadow-2xl' : 'bg-slate-950 text-white shadow-2xl'
+        }`}>
+          <ShieldCheck className="h-8 w-8 text-emerald-400" />
+        </div>
+        <div className="space-y-2">
+          <h2 className={`font-display text-3xl font-black tracking-tight ${
+            theme === 'dark' ? 'text-white' : 'text-slate-900'
+          }`}>
+            Sign In to View Profile
+          </h2>
+          <p className={`text-sm max-w-md mx-auto leading-relaxed ${
+            theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            Manage your Soroban smart contract credentials, credit score telemetry, and SEP-0024 fiat gateway.
+          </p>
+        </div>
+        <button
+          className={`rounded-xl px-8 py-3 text-sm font-bold shadow-md hover:scale-105 transition ${
+            theme === 'dark' ? 'bg-white text-black font-black' : 'btn-primary'
+          }`}
+          onClick={() => navigate({ name: 'landing' })}
+        >
+          Return to Home Page
+        </button>
       </div>
     );
   }
@@ -131,6 +156,7 @@ export function ProfilePage() {
     if (!identity.publicKey) return;
     navigator.clipboard.writeText(identity.publicKey).catch(() => {});
     setCopied(true);
+    toast({ kind: 'success', title: 'Address copied' });
     setTimeout(() => setCopied(false), 1400);
   };
 
@@ -138,507 +164,659 @@ export function ProfilePage() {
   const scoreLabel = creditScore >= 800 ? 'Excellent' : creditScore >= 700 ? 'Good' : creditScore >= 600 ? 'Fair' : 'Poor';
   const scoreColor = creditScore >= 800 ? '#10b981' : creditScore >= 700 ? '#0ea5e9' : creditScore >= 600 ? '#f59e0b' : '#ef4444';
   const scoreGradientId = 'scoreGrad' + Math.floor(creditScore / 100);
-  // SVG arc: half-circle 180°, radius 40, center (50,50), from left to right
   const pct = Math.max(0, Math.min(1, (creditScore - 300) / 600));
   const arcLength = 125.7;
   const dashOffset = arcLength * (1 - pct);
 
   const statusMeta: Record<string, { label: string; bg: string; dot: string }> = {
-    forming:   { label: 'Forming',   bg: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',     dot: 'bg-amber-400' },
-    active:    { label: 'Active',    bg: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', dot: 'bg-emerald-400' },
-    completed: { label: 'Completed', bg: 'bg-slate-100 text-slate-500 ring-1 ring-slate-200',     dot: 'bg-slate-400' },
-    cancelled: { label: 'Cancelled', bg: 'bg-red-50 text-red-600 ring-1 ring-red-200',            dot: 'bg-red-400' },
+    forming:   { label: 'Forming',   bg: theme === 'dark' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',     dot: 'bg-amber-400' },
+    active:    { label: 'Active',    bg: theme === 'dark' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', dot: 'bg-emerald-400' },
+    completed: { label: 'Completed', bg: theme === 'dark' ? 'bg-slate-800 text-slate-300 border border-white/10' : 'bg-slate-100 text-slate-500 ring-1 ring-slate-200',     dot: 'bg-slate-400' },
+    cancelled: { label: 'Cancelled', bg: theme === 'dark' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-red-50 text-red-600 ring-1 ring-red-200',            dot: 'bg-red-400' },
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)' }}>
-      {/* ── Hero Banner ─────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden" style={{
-        background: 'linear-gradient(135deg, rgba(2,10,30,0.98) 0%, rgba(5,25,50,0.98) 60%, rgba(2,20,40,0.98) 100%)',
-        borderBottom: '1px solid rgba(255,255,255,0.04)',
-      }}>
-        {/* Ambient orbs */}
-        <div className="pointer-events-none absolute -top-16 right-0 h-80 w-80 rounded-full bg-emerald-500/10 blur-[100px]" />
-        <div className="pointer-events-none absolute -bottom-10 left-0 h-60 w-60 rounded-full bg-sky-500/8 blur-[80px]" />
-        <div className="pointer-events-none absolute top-0 left-1/3 h-48 w-48 rounded-full bg-indigo-500/6 blur-[80px]" />
-
-        <div className="relative mx-auto max-w-[1600px] px-4 py-10 sm:px-6 lg:px-10">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            {/* Avatar + identity */}
-            <div className="flex items-center gap-5">
-              <div className="relative">
-                <div
-                  className="grid h-20 w-20 place-items-center rounded-3xl text-2xl font-black text-white shadow-2xl"
-                  style={{ background: avatarGradient(seed), boxShadow: `0 0 0 3px rgba(255,255,255,0.08), 0 0 40px rgba(16,185,129,0.2)` }}
-                >
-                  {initials(identity.name)}
-                </div>
-                <div className="absolute -bottom-1.5 -right-1.5 grid h-6 w-6 place-items-center rounded-full bg-emerald-500 shadow-md"
-                     style={{ boxShadow: '0 0 12px rgba(16,185,129,0.6)' }}>
-                  <ShieldCheck className="h-3.5 w-3.5 text-white" />
-                </div>
+    <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10 space-y-8 animate-page-enter">
+      {/* ── Top Executive Profile Header Bar ── */}
+      <div className={`rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-300 space-y-6 border ${
+        theme === 'dark'
+          ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+          : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+      }`}>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div
+              className={`grid h-16 w-16 shrink-0 place-items-center rounded-2xl text-xl font-black text-white shadow-md ring-4 ${
+                theme === 'dark' ? 'ring-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'ring-slate-100'
+              }`}
+              style={{ background: avatarGradient(seed) }}
+            >
+              {initials(identity.name)}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className={`font-display text-2xl sm:text-3xl font-black tracking-tight ${
+                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>{identity.name}</h1>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
+                  theme === 'dark' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                }`}>
+                  <ShieldCheck className="h-3 w-3" /> Soroban Verified
+                </span>
               </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="font-display text-2xl font-black text-white">{identity.name}</h1>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald-300 ring-1 ring-emerald-500/30">
-                    Verified Member
+              <div className={`flex items-center gap-3 text-xs font-mono mt-1 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-500'
+              }`}>
+                <span>{identity.publicKey ? shortAddress(identity.publicKey, 8, 6) : identity.email}</span>
+                {identity.publicKey && (
+                  <button onClick={copyAddr} className={`transition flex items-center gap-1 ${
+                    theme === 'dark' ? 'hover:text-emerald-400' : 'hover:text-slate-900'
+                  }`}>
+                    {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
+                  </button>
+                )}
+                <span className={theme === 'dark' ? 'text-slate-600' : 'text-slate-300'}>·</span>
+                <span className={theme === 'dark' ? 'text-emerald-400 font-bold' : 'text-emerald-600 font-bold'}>Stellar Testnet</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 self-start md:self-auto">
+            <button
+              onClick={() => setIsFeedbackOpen(true)}
+              className={`rounded-xl px-4 py-2.5 text-xs font-bold transition flex items-center gap-1.5 ${
+                theme === 'dark'
+                  ? 'bg-slate-800/80 text-slate-200 border border-white/10 hover:bg-white/15 hover:text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <MessageSquare className="h-4 w-4" /> Leave Review
+            </button>
+            <button
+              onClick={() => navigate({ name: 'create' })}
+              className={`rounded-xl px-5 py-2.5 text-xs font-black transition flex items-center gap-1.5 shadow-md hover:scale-105 ${
+                theme === 'dark'
+                  ? 'bg-white text-black hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.25)]'
+                  : 'bg-slate-900 text-white hover:bg-emerald-600'
+              }`}
+            >
+              <Plus className="h-4 w-4" /> Create Circle
+            </button>
+          </div>
+        </div>
+
+        {/* ── Profile Segmented Tabs ── */}
+        <div className={`flex items-center gap-2 border-t pt-6 overflow-x-auto ${
+          theme === 'dark' ? 'border-white/10' : 'border-slate-100'
+        }`}>
+          {[
+            { key: 'overview', label: 'Overview & Reputation', icon: ShieldCheck },
+            { key: 'committees', label: 'My ROSCA Circles', icon: Activity, count: myCommittees.length },
+            { key: 'fiat-gateway', label: 'INR Fiat Gateway', icon: Landmark },
+            { key: 'settings', label: 'Settings & Wallet', icon: Settings },
+          ].map((t) => {
+            const Icon = t.icon;
+            const active = activeTab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key as ProfileTab)}
+                className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs transition-all duration-200 ${
+                  active
+                    ? theme === 'dark' ? 'bg-white text-black font-black shadow-md' : 'bg-slate-900 text-white font-black shadow-md'
+                    : theme === 'dark' ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white border border-white/10' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-bold'
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${active ? (theme === 'dark' ? 'text-black' : 'text-emerald-400') : (theme === 'dark' ? 'text-slate-400' : 'text-slate-400')}`} />
+                <span>{t.label}</span>
+                {t.count !== undefined && (
+                  <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${
+                    active
+                      ? theme === 'dark' ? 'bg-black/10 text-black font-black' : 'bg-white/20 text-white'
+                      : theme === 'dark' ? 'bg-slate-900 text-slate-400' : 'bg-slate-200 text-slate-600'
+                  }`}>
+                    {t.count}
                   </span>
-                </div>
-                <p className="mt-0.5 text-sm text-slate-400">{identity.email}</p>
-                {identity.bio && <p className="mt-1 text-sm text-slate-300 max-w-md leading-relaxed">{identity.bio}</p>}
-                <p className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-500">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  Member since {new Date(identity.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </p>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── TAB 1: OVERVIEW & REPUTATION (BENTO BOX GRID) ── */}
+      {activeTab === 'overview' && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Bento Card 1: Credit Score Gauge */}
+          <div className={`rounded-3xl p-6 text-white shadow-2xl space-y-4 relative overflow-hidden border backdrop-blur-2xl ${
+            theme === 'dark'
+              ? 'liquid-glass bg-slate-900/90 border-white/10'
+              : 'bg-slate-950 border-slate-800 shadow-xl'
+          }`}>
+            <div className="pointer-events-none absolute -top-10 right-0 h-40 w-40 rounded-full blur-3xl opacity-20" style={{ background: scoreColor }} />
+
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" /> Credit Telemetry
+              </span>
+              <span className="text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                Tier A Prime
+              </span>
+            </div>
+
+            <div className="relative mx-auto flex h-36 w-56 items-end justify-center pt-2">
+              <svg viewBox="0 0 120 70" className="w-full h-full" overflow="visible">
+                <defs>
+                  <linearGradient id={scoreGradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="40%" stopColor="#f59e0b" />
+                    <stop offset="75%" stopColor="#0ea5e9" />
+                    <stop offset="100%" stopColor="#10b981" />
+                  </linearGradient>
+                </defs>
+                <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="10" strokeLinecap="round" />
+                <path
+                  d="M 10 60 A 50 50 0 0 1 110 60"
+                  fill="none"
+                  stroke={`url(#${scoreGradientId})`}
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeDasharray={arcLength}
+                  strokeDashoffset={dashOffset}
+                  style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
+                />
+              </svg>
+              <div className="absolute bottom-2 text-center">
+                <div className="font-mono text-4xl font-black text-white">{creditScore}</div>
+                <div className="text-xs font-bold uppercase tracking-wider mt-0.5" style={{ color: scoreColor }}>{scoreLabel}</div>
               </div>
             </div>
 
-            {/* Header stat pills */}
-            <div className="flex flex-wrap gap-3">
+            <div className="space-y-2 text-left pt-2 border-t border-white/10">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Score Boosters</p>
               {[
-                { icon: Activity,    value: stats?.committeesJoined ?? '—',  label: 'Committees Joined' },
-                { icon: Star,        value: stats?.committeesCreated ?? '—', label: 'Committees Created' },
-                { icon: TrendingUp,  value: `${creditScore}`,                label: 'Credit Score' },
-              ].map((s) => {
-                const Icon = s.icon;
+                { label: 'On-Time Payout Contribution', pts: '+15' },
+                { label: 'Complete ROSCA Cycle', pts: '+30' },
+                { label: 'SEP-0024 Fiat Gateway Settlement', pts: '+10' },
+              ].map((b) => (
+                <div key={b.label} className="flex items-center justify-between rounded-xl bg-slate-950/80 p-2.5 border border-white/10 text-xs">
+                  <span className="text-slate-300 font-medium">{b.label}</span>
+                  <span className="font-mono font-bold text-emerald-400">{b.pts}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bento Card 2: Wallet & Identity Telemetry */}
+          <div className={`rounded-3xl p-6 shadow-2xl space-y-4 border transition-all ${
+            theme === 'dark'
+              ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+              : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+          }`}>
+            <h3 className={`font-display text-base font-black flex items-center gap-2 ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>
+              <Wallet className="h-4 w-4 text-sky-400" /> On-Chain Identity
+            </h3>
+
+            <div className="space-y-3">
+              <div className={`p-3.5 rounded-2xl border space-y-1 ${
+                theme === 'dark' ? 'bg-slate-950/80 border-white/10 text-white' : 'bg-slate-50 border-slate-200/80 text-slate-900'
+              }`}>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Stellar Wallet</span>
+                <p className={`font-mono text-xs font-bold truncate ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  {identity.publicKey ? identity.publicKey : 'No wallet linked'}
+                </p>
+              </div>
+
+              <div className={`p-3.5 rounded-2xl border space-y-1 ${
+                theme === 'dark' ? 'bg-slate-950/80 border-white/10 text-white' : 'bg-slate-50 border-slate-200/80 text-slate-900'
+              }`}>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Member Since</span>
+                <p className={`text-xs font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  {new Date(identity.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </p>
+              </div>
+
+              <div className={`p-3.5 rounded-2xl border space-y-1 ${
+                theme === 'dark'
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+              }`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-700'}`}>Network Consensus</span>
+                <p className={`text-xs font-bold flex items-center gap-1.5 ${theme === 'dark' ? 'text-emerald-300' : 'text-emerald-800'}`}>
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> Soroban Testnet Active
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bento Card 3: Reputation Badges */}
+          <div className={`rounded-3xl p-6 shadow-2xl space-y-4 border transition-all ${
+            theme === 'dark'
+              ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+              : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+          }`}>
+            <h3 className={`font-display text-base font-black flex items-center gap-2 ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>
+              <Award className="h-4 w-4 text-amber-400" /> Reputation Badges
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { title: 'Soroban Pioneer', desc: 'Verified contract signer', color: theme === 'dark' ? 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-700' },
+                { title: 'Zero Default', desc: '100% on-time payouts', color: theme === 'dark' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                { title: 'Anchor Verified', desc: 'SEP-0024 Ramp User', color: theme === 'dark' ? 'bg-sky-500/15 border-sky-500/30 text-sky-300' : 'bg-sky-50 border-sky-200 text-sky-700' },
+                { title: 'Community Saver', desc: 'Active ROSCA member', color: theme === 'dark' ? 'bg-amber-500/15 border-amber-500/30 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-700' },
+              ].map((badge) => (
+                <div key={badge.title} className={`p-3 rounded-2xl border text-center space-y-1 ${badge.color}`}>
+                  <div className="font-bold text-xs">{badge.title}</div>
+                  <div className="text-[10px] opacity-80">{badge.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 2: MY ROSCA CIRCLES ── */}
+      {activeTab === 'committees' && (
+        <div className={`rounded-3xl p-6 shadow-2xl border transition-all space-y-5 ${
+          theme === 'dark'
+            ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+            : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+        }`}>
+          <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 ${
+            theme === 'dark' ? 'border-white/10' : 'border-slate-100'
+          }`}>
+            <div>
+              <h3 className={`font-display text-xl font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>My ROSCA Committees</h3>
+              <p className={`text-xs mt-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Manage your active savings circles, contributions, and distributions.</p>
+            </div>
+            <button
+              onClick={() => navigate({ name: 'create' })}
+              className={`rounded-xl px-4 py-2 text-xs font-black shadow-md transition flex items-center gap-1.5 self-start sm:self-auto ${
+                theme === 'dark' ? 'bg-white text-black hover:bg-white/90' : 'bg-slate-900 text-white hover:bg-emerald-600'
+              }`}
+            >
+              <Plus className="h-4 w-4" /> Start New Circle
+            </button>
+          </div>
+
+          {loadingData ? (
+            <div className="grid place-items-center py-12">
+              <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
+            </div>
+          ) : myCommittees.length === 0 ? (
+            <div className={`p-12 text-center rounded-3xl border space-y-3 ${
+              theme === 'dark' ? 'bg-slate-950/80 border-white/10 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
+            }`}>
+              <Activity className="h-10 w-10 text-emerald-400 mx-auto" />
+              <h4 className={`font-display text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>No Committees Joined Yet</h4>
+              <p className={`text-xs ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Explore active public committees on the marketplace or start your own.</p>
+              <button
+                onClick={() => navigate({ name: 'explore' })}
+                className={`rounded-xl px-6 py-2.5 text-xs font-bold border shadow-sm transition ${
+                  theme === 'dark' ? 'bg-white/10 text-white border-white/15 hover:bg-white/20' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                Explore Marketplace →
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {myCommittees.map(c => {
+                const meta = statusMeta[c.status] || statusMeta.completed;
                 return (
-                  <div key={s.label} className="rounded-2xl px-4 py-3 text-center min-w-[90px]"
-                       style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <Icon className="h-4 w-4 text-emerald-400 mx-auto mb-1" />
-                    <div className="font-display text-xl font-black text-white">{s.value}</div>
-                    <div className="text-[10px] font-medium text-slate-400 mt-0.5">{s.label}</div>
-                  </div>
+                  <button
+                    key={c.id}
+                    onClick={() => navigate({ name: 'committee', id: c.id })}
+                    className={`group flex flex-col justify-between gap-4 rounded-2xl p-5 border text-left transition-all duration-200 ${
+                      theme === 'dark'
+                        ? 'bg-slate-950/80 border-white/10 text-white hover:border-emerald-500/40'
+                        : 'bg-white border-slate-200/90 text-slate-900 hover:border-emerald-500/50 hover:shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-black text-white shadow-sm transition ${
+                        theme === 'dark' ? 'bg-white/15 group-hover:bg-emerald-500 group-hover:text-black' : 'bg-slate-900 group-hover:bg-emerald-600'
+                      }`}>
+                        {c.name[0]}
+                      </div>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${meta.bg}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+                        {meta.label}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className={`font-bold text-sm transition ${
+                        theme === 'dark' ? 'text-white group-hover:text-emerald-400' : 'text-slate-900 group-hover:text-emerald-700'
+                      }`}>{c.name}</h4>
+                      <p className={`text-xs font-mono ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>{c.contribution_amount} XLM / cycle · {c.member_count} members</p>
+                    </div>
+
+                    <div className={`pt-2 border-t flex items-center justify-between text-xs font-bold text-emerald-400 ${
+                      theme === 'dark' ? 'border-white/10' : 'border-slate-100'
+                    }`}>
+                      <span>View Details</span>
+                      <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </button>
                 );
               })}
             </div>
-          </div>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* ── Main Grid ───────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-10">
-        <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
+      {/* ── TAB 3: INR FIAT GATEWAY ── */}
+      {activeTab === 'fiat-gateway' && (
+        <div className={`rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all space-y-6 ${
+          theme === 'dark'
+            ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+            : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+        }`}>
+          <div>
+            <h3 className={`font-display text-xl font-black flex items-center gap-2 ${
+              theme === 'dark' ? 'text-white' : 'text-slate-900'
+            }`}>
+              <Landmark className="h-6 w-6 text-sky-400" /> Stellar SEP-0024 Fiat Ramp (INR ↔ XLM)
+            </h3>
+            <p className={`text-xs mt-1 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+              Simulate Indian Rupee (INR) on/off-ramping via anchor UPI bank transfer. Fixed testnet rate: ₹10 = 1 XLM.
+            </p>
+          </div>
 
-          {/* ═══════════════ LEFT COLUMN ═════════════════ */}
-          <div className="space-y-5">
+          <form onSubmit={handleAnchorSimulate} className="space-y-5 max-w-2xl">
+            <div className={`grid grid-cols-2 rounded-2xl p-1 text-xs font-bold border ${
+              theme === 'dark' ? 'bg-slate-950/80 border-white/10' : 'bg-slate-100 border-slate-200'
+            }`}>
+              {(['deposit', 'withdrawal'] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => { setAnchorType(t); setAnchorAmountInr(''); setAnchorAmountXlm(''); }}
+                  className={`rounded-xl py-2.5 transition-all ${
+                    anchorType === t
+                      ? theme === 'dark' ? 'bg-white text-black font-black shadow-md' : 'bg-white text-slate-900 shadow-sm font-black'
+                      : theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {t === 'deposit' ? '⬇ Deposit (INR → XLM)' : '⬆ Withdraw (XLM → INR)'}
+                </button>
+              ))}
+            </div>
 
-            {/* Credit Score Gauge */}
-            <div className="relative overflow-hidden rounded-3xl p-6 text-center"
-                 style={{ background: 'linear-gradient(135deg, rgba(2,10,30,0.97) 0%, rgba(2,26,46,0.97) 100%)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 25px 60px rgba(0,0,0,0.3)' }}>
-              <div className="pointer-events-none absolute -top-8 right-0 h-40 w-40 rounded-full blur-[60px]" style={{ background: scoreColor + '20' }} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className={`text-[11px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>INR Amount (₹)</label>
+                <input
+                  type="number"
+                  min={1}
+                  className={`mt-1 w-full rounded-xl px-3.5 py-2 text-xs font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition ${
+                    theme === 'dark' ? 'bg-slate-950/80 text-white border-white/10' : 'bg-white text-slate-900 border-slate-200'
+                  }`}
+                  value={anchorAmountInr}
+                  onChange={e => { const v = e.target.value; setAnchorAmountInr(v); setAnchorAmountXlm(v ? (Number(v) / 10).toFixed(2) : ''); }}
+                  placeholder="e.g. 500"
+                  required
+                />
+              </div>
+              <div>
+                <label className={`text-[11px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>XLM {anchorType === 'deposit' ? 'Received' : 'Sent'}</label>
+                <input
+                  type="number"
+                  className={`mt-1 w-full rounded-xl border px-3.5 py-2 text-xs font-mono font-bold ${
+                    theme === 'dark' ? 'bg-slate-950/90 text-emerald-400 border-white/10' : 'bg-slate-50 text-slate-700 border-slate-200'
+                  }`}
+                  value={anchorAmountXlm}
+                  readOnly
+                  placeholder="50"
+                />
+              </div>
+            </div>
 
-              <div className="relative z-10">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Credit Trust Score</span>
-                </div>
+            <div>
+              <label className={`text-[11px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>
+                {anchorType === 'deposit' ? 'UPI VPA / Bank ID' : 'Withdrawal UPI VPA'}
+              </label>
+              <input
+                type="text"
+                className={`mt-1 w-full rounded-xl border px-3.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition ${
+                  theme === 'dark' ? 'bg-slate-950/80 text-white border-white/10' : 'bg-white text-slate-900 border-slate-200'
+                }`}
+                value={upiId}
+                onChange={e => setUpiId(e.target.value)}
+                placeholder="e.g. sovereign@upi"
+                required
+              />
+            </div>
 
-                {/* Large gauge SVG */}
-                <div className="relative mx-auto flex h-36 w-56 items-end justify-center">
-                  <svg viewBox="0 0 120 70" className="w-full h-full" overflow="visible">
-                    <defs>
-                      <linearGradient id={scoreGradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%"   stopColor="#ef4444" />
-                        <stop offset="40%"  stopColor="#f59e0b" />
-                        <stop offset="75%"  stopColor="#0ea5e9" />
-                        <stop offset="100%" stopColor="#10b981" />
-                      </linearGradient>
-                      {/* Glow filter */}
-                      <filter id="glow">
-                        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                        <feMerge>
-                          <feMergeNode in="coloredBlur"/>
-                          <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    {/* Track */}
-                    <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="10" strokeLinecap="round"/>
-                    {/* Fill */}
-                    <path
-                      d="M 10 60 A 50 50 0 0 1 110 60"
-                      fill="none"
-                      stroke={`url(#${scoreGradientId})`}
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                      strokeDasharray={arcLength}
-                      strokeDashoffset={dashOffset}
-                      filter="url(#glow)"
-                      style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
-                    />
-                    {/* Needle dot */}
-                    {pct > 0.01 && (() => {
-                      const angle = Math.PI * (1 - pct);
-                      const cx = 60 + 50 * Math.cos(angle + Math.PI);
-                      const cy = 60 + 50 * Math.sin(angle + Math.PI);
-                      return <circle cx={cx} cy={cy} r="5" fill={scoreColor} filter="url(#glow)" />;
-                    })()}
-                    {/* Tick marks */}
-                    {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
-                      const a = Math.PI * (1 - t);
-                      const r1 = 56, r2 = 62;
-                      return (
-                        <line key={i}
-                          x1={60 + r1 * Math.cos(a + Math.PI)} y1={60 + r1 * Math.sin(a + Math.PI)}
-                          x2={60 + r2 * Math.cos(a + Math.PI)} y2={60 + r2 * Math.sin(a + Math.PI)}
-                          stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round"
-                        />
-                      );
-                    })}
-                  </svg>
-                  {/* Score text inside gauge */}
-                  <div className="absolute bottom-2 text-center">
-                    <div className="font-display text-4xl font-black text-white" style={{ textShadow: `0 0 20px ${scoreColor}60` }}>{creditScore}</div>
-                    <div className="text-xs font-bold uppercase tracking-widest mt-0.5" style={{ color: scoreColor }}>{scoreLabel}</div>
-                  </div>
-                </div>
+            <button
+              type="submit"
+              disabled={simulatingAnchor}
+              className={`w-full rounded-xl py-3 text-xs font-black shadow-md transition flex items-center justify-center gap-2 ${
+                theme === 'dark'
+                  ? 'bg-white text-black hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                  : 'bg-slate-900 text-white hover:bg-emerald-600'
+              }`}
+            >
+              {simulatingAnchor ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> Settling SEP-0024 Gateway...</>
+              ) : anchorType === 'deposit' ? (
+                <><Send className="h-4 w-4" /> Execute INR Deposit (₹{anchorAmountInr || '0'})</>
+              ) : (
+                <><ArrowUpDown className="h-4 w-4" /> Withdraw XLM to INR (₹{anchorAmountInr || '0'})</>
+              )}
+            </button>
+          </form>
 
-                {/* Range labels */}
-                <div className="flex justify-between text-[9px] font-bold text-slate-600 mt-1 px-2">
-                  <span>300 Poor</span>
-                  <span>600 Fair</span>
-                  <span>Excellent 900</span>
-                </div>
-
-                {/* Score bar */}
-                <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                  <div
-                    className="h-full rounded-full transition-all duration-1000"
-                    style={{ width: `${pct * 100}%`, background: `linear-gradient(90deg, #ef4444, #f59e0b, ${scoreColor})` }}
-                  />
-                </div>
-
-                {/* Boosters */}
-                <div className="mt-5 space-y-2 text-left">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Score Boosters</p>
-                  {[
-                    { label: 'Contribute on-time', pts: '+15' },
-                    { label: 'Complete a full group', pts: '+30' },
-                    { label: 'Fiat anchor deposit', pts: '+10' },
-                  ].map((b) => (
-                    <div key={b.label} className="flex items-center justify-between rounded-xl px-3 py-2"
-                         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <span className="text-[11px] text-slate-300">{b.label}</span>
-                      <span className="text-[11px] font-bold text-emerald-400">{b.pts}</span>
+          {/* Settlement History Log */}
+          {anchorTxs.length > 0 && (
+            <div className={`pt-6 border-t space-y-3 ${theme === 'dark' ? 'border-white/10' : 'border-slate-100'}`}>
+              <h4 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>
+                <History className={`h-4 w-4 ${theme === 'dark' ? 'text-white' : 'text-slate-700'}`} /> Settlement Log
+              </h4>
+              <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
+                {anchorTxs.map(tx => (
+                  <div key={tx.id} className={`flex items-center justify-between rounded-xl p-3.5 border text-xs ${
+                    theme === 'dark' ? 'bg-slate-950/80 border-white/10 text-white' : 'bg-slate-50 border-slate-100 text-slate-900'
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <span className={`inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-black ${
+                        tx.tx_type === 'deposit'
+                          ? theme === 'dark' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-100 text-emerald-800'
+                          : theme === 'dark' ? 'bg-sky-500/20 text-sky-300' : 'bg-sky-100 text-sky-800'
+                      }`}>
+                        {tx.tx_type === 'deposit' ? '↓' : '↑'}
+                      </span>
+                      <div>
+                        <span className={`font-bold capitalize ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{tx.tx_type}</span>
+                        <span className="block text-[10px] text-slate-400 font-mono">
+                          {new Date(tx.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="text-right font-mono">
+                      <div className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{tx.amount_xlm} XLM</div>
+                      <div className={`text-[10px] ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>₹{tx.amount_inr}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-                <p className="mt-4 text-[10px] leading-relaxed text-slate-500 text-center">
-                  Higher scores unlock lower bidding rates and larger pool limits.
+      {/* ── TAB 4: SETTINGS & WALLET ── */}
+      {activeTab === 'settings' && (
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Credentials Settings Card */}
+          <div className={`rounded-3xl p-6 border shadow-2xl space-y-4 transition-all ${
+            theme === 'dark'
+              ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+              : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+          }`}>
+            <div className={`flex items-center justify-between border-b pb-3 ${theme === 'dark' ? 'border-white/10' : 'border-slate-100'}`}>
+              <h3 className={`font-display text-base font-black flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                <User className="h-4 w-4 text-emerald-400" /> Profile Credentials
+              </h3>
+              {!editing ? (
+                <button
+                  onClick={startEdit}
+                  className={`text-xs font-bold px-3 py-1 rounded-lg transition flex items-center gap-1 ${
+                    theme === 'dark' ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:text-slate-900'
+                  }`}
+                >
+                  <Edit2 className="h-3 w-3" /> Edit Profile
+                </button>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => setEditing(false)} className="text-xs font-bold text-slate-400 hover:text-white p-1">
+                    <X className="h-4 w-4" />
+                  </button>
+                  <button onClick={saveEdit} disabled={saving} className={`rounded-lg px-3 py-1 text-xs font-bold flex items-center gap-1 ${
+                    theme === 'dark' ? 'bg-white text-black font-black' : 'bg-slate-900 text-white'
+                  }`}>
+                    {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />} Save
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label className={`text-[11px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>Display Name</label>
+                {editing ? (
+                  <input
+                    className={`w-full rounded-xl border px-3.5 py-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+                      theme === 'dark' ? 'bg-slate-950/80 text-white border-white/10' : 'bg-white text-slate-900 border-slate-200'
+                    }`}
+                    value={nameInput}
+                    onChange={e => setNameInput(e.target.value)}
+                    maxLength={40}
+                    autoFocus
+                  />
+                ) : (
+                  <p className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{identity.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className={`text-[11px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>Email Address</label>
+                <p className={`text-xs font-mono ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>
+                  {identity.email}
+                  <span className={`ml-2 inline-block rounded px-1.5 py-0.5 text-[9px] font-bold ${
+                    theme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-400'
+                  }`}>Locked</span>
                 </p>
               </div>
-            </div>
 
-            {/* Account Details */}
-            <div className="rounded-3xl bg-white p-5 shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display text-sm font-bold text-ink-900 flex items-center gap-2">
-                  <User className="h-4 w-4 text-emerald-500" /> Account Details
-                </h3>
-                {!editing
-                  ? <button onClick={startEdit} className="btn-ghost btn-sm text-[11px] gap-1"><Edit2 className="h-3.5 w-3.5" /> Edit</button>
-                  : <div className="flex gap-1.5">
-                      <button onClick={() => setEditing(false)} className="btn-ghost btn-sm"><X className="h-4 w-4" /></button>
-                      <button onClick={saveEdit} disabled={saving} className="btn-primary btn-sm">
-                        {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Save
-                      </button>
-                    </div>
-                }
-              </div>
-              <div className="space-y-3">
-                <Field label="Display name" icon={<User className="h-3.5 w-3.5" />}>
-                  {editing
-                    ? <input className="input" value={nameInput} onChange={e => setNameInput(e.target.value)} maxLength={40} autoFocus />
-                    : <p className="text-sm font-semibold text-ink-900">{identity.name}</p>}
-                </Field>
-                <Field label="Email" icon={<Mail className="h-3.5 w-3.5" />}>
-                  <p className="text-sm text-ink-500">
-                    {identity.email}
-                    <span className="ml-2 inline-block rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-400">Cannot change</span>
-                  </p>
-                </Field>
-                <Field label="Bio" icon={<MessageSquare className="h-3.5 w-3.5" />}>
-                  {editing
-                    ? <textarea className="input resize-none min-h-[68px] text-sm" value={bioInput} onChange={e => setBioInput(e.target.value)} maxLength={280} placeholder="Tell others about yourself…" />
-                    : <p className="text-sm text-ink-600">{identity.bio || <span className="text-ink-400 italic">No bio yet</span>}</p>}
-                </Field>
-              </div>
-            </div>
-
-            {/* Stellar Wallet */}
-            <div className="rounded-3xl bg-white p-5 shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
-              <h3 className="font-display text-sm font-bold text-ink-900 flex items-center gap-2 mb-1">
-                <Wallet className="h-4 w-4 text-sky-500" /> Stellar Wallet
-              </h3>
-              <p className="text-[11px] text-ink-400 mb-4">Link your Freighter wallet to sign on-chain transactions and contribute to committees.</p>
-
-              {identity.publicKey ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2 rounded-2xl px-3.5 py-3"
-                       style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)' }}>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-emerald-100">
-                        <Shield className="h-3.5 w-3.5 text-emerald-600" />
-                      </div>
-                      <span className="font-mono text-xs text-emerald-800 truncate">{shortAddress(identity.publicKey, 12, 10)}</span>
-                    </div>
-                    <button onClick={copyAddr} className="shrink-0 rounded-lg p-1.5 text-emerald-600 transition hover:bg-emerald-100">
-                      {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
-                  </div>
-                  <div className="flex gap-2">
-                    <a href={`https://stellar.expert/explorer/testnet/account/${identity.publicKey}`}
-                       target="_blank" rel="noopener noreferrer"
-                       className="btn-ghost btn-sm flex-1 justify-center text-[11px]">
-                      <ExternalLink className="h-3.5 w-3.5" /> Explorer
-                    </a>
-                    <button onClick={handleUnlinkWallet} className="btn-ghost btn-sm flex-1 justify-center text-[11px] text-red-600 hover:bg-red-50">
-                      <Link2Off className="h-3.5 w-3.5" /> Unlink
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                !freighterChecking && !freighterInstalled ? (
-                  <div className="rounded-2xl p-4" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)' }}>
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="mt-0.5 h-4 w-4 text-amber-500 shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-amber-800">Freighter not installed</p>
-                        <p className="mt-1 text-xs text-amber-700">Install the Freighter browser extension to link your Stellar wallet.</p>
-                        <a href="https://www.freighter.app/" target="_blank" rel="noopener noreferrer"
-                          className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-amber-700 hover:text-amber-900">
-                          Install Freighter <ExternalLink className="h-3 w-3" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
+              <div className="space-y-1">
+                <label className={`text-[11px] font-bold uppercase tracking-wider ${theme === 'dark' ? 'text-slate-300' : 'text-slate-500'}`}>Bio</label>
+                {editing ? (
+                  <textarea
+                    className={`w-full rounded-xl border p-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none min-h-[70px] ${
+                      theme === 'dark' ? 'bg-slate-950/80 text-white border-white/10' : 'bg-white text-slate-900 border-slate-200'
+                    }`}
+                    value={bioInput}
+                    onChange={e => setBioInput(e.target.value)}
+                    maxLength={280}
+                    placeholder="Tell others about yourself..."
+                  />
                 ) : (
-                  <button onClick={handleLinkWallet}
-                    disabled={linkingWallet || freighterChecking || (!freighterInstalled && !isFreighterSync())}
-                    className="btn-primary w-full justify-center rounded-2xl">
-                    {linkingWallet ? <><Loader2 className="h-4 w-4 animate-spin" /> Connecting…</> : <><Wallet className="h-4 w-4" /> Connect Freighter</>}
-                  </button>
-                )
-              )}
+                  <p className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>{identity.bio || <span className="text-slate-500 italic">No bio provided</span>}</p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* ═══════════════ RIGHT COLUMN ════════════════ */}
-          <div className="space-y-5">
+          {/* Freighter Wallet Integration */}
+          <div className={`rounded-3xl p-6 border shadow-2xl space-y-4 transition-all ${
+            theme === 'dark'
+              ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+              : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+          }`}>
+            <h3 className={`font-display text-base font-black flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+              <Wallet className="h-4 w-4 text-sky-400" /> Freighter Wallet Setup
+            </h3>
+            <p className={`text-xs leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+              Connect your Stellar Freighter extension to sign Soroban smart contract operations and execute rotation payouts.
+            </p>
 
-            {/* My Committees */}
-            <div className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h3 className="font-display text-base font-bold text-ink-900 flex items-center gap-2">
-                    <Activity className="h-4.5 w-4.5 text-emerald-500" /> My ROSCA Committees
-                  </h3>
-                  <p className="text-[11px] text-ink-400 mt-0.5">Manage your active savings circles, contributions, and distributions.</p>
+            {identity.publicKey ? (
+              <div className="space-y-3">
+                <div className={`flex items-center justify-between gap-2 rounded-2xl p-3.5 border ${
+                  theme === 'dark'
+                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                    : 'bg-emerald-50/70 border-emerald-200/80 text-emerald-900'
+                }`}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Shield className="h-4 w-4 text-emerald-400 shrink-0" />
+                    <span className="font-mono text-xs font-bold truncate">{shortAddress(identity.publicKey, 10, 8)}</span>
+                  </div>
+                  <button onClick={copyAddr} className="text-emerald-400 hover:text-emerald-300 transition shrink-0 p-1">
+                    {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                  </button>
                 </div>
-                <button onClick={() => navigate({ name: 'create' })} className="btn-primary btn-sm rounded-xl gap-1.5">
-                  <Plus className="h-3.5 w-3.5" /> New Committee
-                </button>
+                <div className="flex gap-2">
+                  <a
+                    href={`https://stellar.expert/explorer/testnet/account/${identity.publicKey}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex-1 rounded-xl py-2 text-center text-xs font-bold border transition flex items-center justify-center gap-1 ${
+                      theme === 'dark'
+                        ? 'bg-slate-800/80 text-slate-200 border-white/10 hover:bg-slate-700'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> Explorer
+                  </a>
+                  <button
+                    onClick={handleUnlinkWallet}
+                    className="flex-1 rounded-xl py-2 text-center text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition flex items-center justify-center gap-1"
+                  >
+                    <Link2Off className="h-3.5 w-3.5" /> Unlink
+                  </button>
+                </div>
               </div>
-
-              {loadingData ? (
-                <div className="grid place-items-center py-10">
-                  <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
-                </div>
-              ) : myCommittees.length === 0 ? (
-                <div className="flex flex-col items-center gap-3 py-10 text-center">
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-50">
-                    <Activity className="h-6 w-6 text-emerald-400" />
-                  </div>
-                  <p className="text-sm text-ink-500">No committees yet.</p>
-                  <button onClick={() => navigate({ name: 'create' })} className="btn-primary btn-sm rounded-xl">Create your first →</button>
-                </div>
-              ) : (
-                <div className="space-y-2.5">
-                  {myCommittees.map(c => {
-                    const meta = statusMeta[c.status] || statusMeta.completed;
-                    return (
-                      <button
-                        key={c.id}
-                        onClick={() => navigate({ name: 'committee', id: c.id })}
-                        className="group flex w-full items-center justify-between gap-4 rounded-2xl px-4 py-3.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                        style={{ background: 'rgba(248,250,252,0.8)', border: '1px solid rgba(0,0,0,0.05)' }}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-black text-white shadow-sm gradient-brand">
-                            {c.name[0]}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-ink-900 truncate text-sm group-hover:text-emerald-700 transition-colors">{c.name}</p>
-                            <p className="text-[11px] text-ink-400">{c.contribution_amount} XLM / cycle · {c.member_count} members</p>
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${meta.bg}`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-                            {meta.label}
-                          </span>
-                          <ChevronRight className="h-4 w-4 text-ink-300 group-hover:text-emerald-500 transition-colors" />
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Stellar Fiat Anchor */}
-            <div className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
-              <h3 className="font-display text-base font-bold text-ink-900 flex items-center gap-2 mb-1">
-                <Landmark className="h-4.5 w-4.5 text-sky-500" /> Stellar Fiat Anchor (INR ↔ XLM)
-              </h3>
-              <p className="text-[11px] text-ink-400 mb-5">
-                Simulate Indian Rupee (INR) on/off-ramping via anchor UPI bank transfer. Rate: ₹10 = 1 XLM.
-              </p>
-
-              <form onSubmit={handleAnchorSimulate} className="space-y-4">
-                {/* Tab toggle */}
-                <div className="flex rounded-2xl p-1.5" style={{ background: 'rgba(241,245,249,0.8)', border: '1px solid rgba(0,0,0,0.04)' }}>
-                  {(['deposit', 'withdrawal'] as const).map((t) => (
-                    <button key={t} type="button"
-                      onClick={() => { setAnchorType(t); setAnchorAmountInr(''); setAnchorAmountXlm(''); }}
-                      className={`flex-1 rounded-xl py-2 text-xs font-bold transition-all duration-200 ${
-                        anchorType === t
-                          ? 'bg-white text-ink-900 shadow-sm'
-                          : 'text-ink-500 hover:text-ink-800'
-                      }`}
-                    >
-                      {t === 'deposit' ? '⬇ Deposit (INR → XLM)' : '⬆ Withdraw (XLM → INR)'}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="label text-[11px]">INR Amount (₹)</label>
-                    <input type="number" min={1} className="input" value={anchorAmountInr}
-                      onChange={e => { const v = e.target.value; setAnchorAmountInr(v); setAnchorAmountXlm(v ? (Number(v) / 10).toFixed(2) : ''); }}
-                      placeholder="e.g. 500" required />
-                  </div>
-                  <div>
-                    <label className="label text-[11px]">XLM {anchorType === 'deposit' ? 'Received' : 'Sent'}</label>
-                    <input type="number" className="input bg-slate-50 text-ink-500" value={anchorAmountXlm} readOnly placeholder="50" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="label text-[11px]">
-                    {anchorType === 'deposit' ? 'Pay via UPI ID' : 'Withdrawal UPI / VPA'}
-                  </label>
-                  <input type="text" className="input" value={upiId}
-                    onChange={e => setUpiId(e.target.value)} placeholder="e.g. upi@paytm" required />
-                </div>
-
-                <button type="submit" disabled={simulatingAnchor} className="btn-primary w-full justify-center rounded-2xl py-3">
-                  {simulatingAnchor
-                    ? <><Loader2 className="h-4 w-4 animate-spin" /> Settling…</>
-                    : anchorType === 'deposit'
-                      ? <><Send className="h-4 w-4" /> Deposit ₹{anchorAmountInr || '0'}</>
-                      : <><ArrowUpDown className="h-4 w-4" /> Withdraw ₹{anchorAmountInr || '0'}</>}
-                </button>
-              </form>
-
-              {/* Transaction history */}
-              {anchorTxs.length > 0 && (
-                <div className="mt-5 pt-5 border-t border-ink-100">
-                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-ink-400 flex items-center gap-1.5 mb-3">
-                    <History className="h-3.5 w-3.5" /> Settlement History
-                  </h4>
-                  <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
-                    {anchorTxs.map(tx => (
-                      <div key={tx.id} className="flex items-center justify-between rounded-xl px-3 py-2.5"
-                           style={{ background: 'rgba(248,250,252,0.8)', border: '1px solid rgba(0,0,0,0.04)' }}>
-                        <div className="flex items-center gap-2.5">
-                          <span className={`inline-flex h-6 w-6 items-center justify-center rounded-lg text-[9px] font-black ${tx.tx_type === 'deposit' ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'}`}>
-                            {tx.tx_type === 'deposit' ? '↓' : '↑'}
-                          </span>
-                          <div>
-                            <span className="text-xs font-semibold text-ink-900 capitalize">{tx.tx_type}</span>
-                            <span className="block text-[10px] text-ink-400">
-                              {new Date(tx.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs font-bold text-ink-900">{tx.amount_xlm} XLM</div>
-                          <div className="text-[10px] text-ink-400">₹{tx.amount_inr}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Community Feedback */}
-            <div className="rounded-3xl bg-white p-6 shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.05)' }}>
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="font-display text-base font-bold text-ink-900 flex items-center gap-2">
-                  <MessageSquare className="h-4.5 w-4.5 text-indigo-500" /> Platform Reviews
-                </h3>
-                <button onClick={() => setIsFeedbackOpen(true)} className="btn-primary btn-sm rounded-xl gap-1.5">
-                  <Plus className="h-3.5 w-3.5" /> Leave Feedback
-                </button>
-              </div>
-              <p className="text-[11px] text-ink-400 mb-5">Community reviews submitted by RotaFi members.</p>
-
-              {feedbacks.length === 0 ? (
-                <p className="text-sm text-ink-400 italic text-center py-6">No reviews yet. Be the first!</p>
-              ) : (
-                <div className="max-h-72 overflow-y-auto space-y-3 pr-1">
-                  {feedbacks.map((fb) => (
-                    <div key={fb.id} className="group rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
-                         style={{ background: 'rgba(248,250,252,0.9)', border: '1px solid rgba(0,0,0,0.04)' }}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2.5">
-                          <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-indigo-100 text-xs font-black text-indigo-600">
-                            {fb.user_name[0]}
-                          </div>
-                          <div>
-                            <p className="text-xs font-bold text-ink-900">{fb.user_name}</p>
-                            <span className="inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-bold text-indigo-700 ring-1 ring-indigo-100">
-                              {fb.category}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-0.5">
-                          {[1,2,3,4,5].map(s => (
-                            <Star key={s} className={`h-3 w-3 ${s <= fb.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-200'}`} />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="mt-2.5 text-xs leading-relaxed text-ink-600">"{fb.comment}"</p>
-                      <p className="mt-1.5 text-[9px] text-ink-400">
-                        {new Date(fb.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </p>
+            ) : (
+              !freighterChecking && !freighterInstalled ? (
+                <div className="rounded-2xl p-4 bg-amber-500/10 border border-amber-500/20 text-amber-300 space-y-2">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold">Freighter Extension Not Detected</p>
+                      <p className="text-[11px] text-amber-200">Install Freighter to connect your Stellar wallet on testnet.</p>
+                      <a href="https://www.freighter.app/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-bold text-amber-300 underline pt-1">
+                        Get Freighter Extension <ExternalLink className="h-3 w-3" />
+                      </a>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
-            </div>
-
+              ) : (
+                <button
+                  onClick={handleLinkWallet}
+                  disabled={linkingWallet || freighterChecking || (!freighterInstalled && !isFreighterSync())}
+                  className={`w-full rounded-xl py-3 text-xs font-black shadow-md transition flex items-center justify-center gap-2 ${
+                    theme === 'dark'
+                      ? 'bg-white text-black hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                      : 'bg-slate-900 text-white hover:bg-emerald-600'
+                  }`}
+                >
+                  {linkingWallet ? <><Loader2 className="h-4 w-4 animate-spin" /> Connecting Freighter...</> : <><Wallet className="h-4 w-4" /> Link Freighter Wallet</>}
+                </button>
+              )
+            )}
           </div>
         </div>
-      </div>
+      )}
 
-      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} onSubmitted={loadProfileData} />
-    </div>
-  );
-}
-
-function Field({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="label flex items-center gap-1.5 text-[11px]">
-        <span className="text-ink-400">{icon}</span>{label}
-      </label>
-      {children}
+      {/* Feedback Modal */}
+      <FeedbackModal open={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} onSubmitted={loadProfileData} />
     </div>
   );
 }

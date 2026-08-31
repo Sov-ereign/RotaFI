@@ -13,15 +13,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    scroll-behavior: smooth;
   }
   body {
     @apply bg-slate-50 text-ink-900 font-sans antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    background-image:
-      radial-gradient(ellipse 1200px 800px at 100% -5%, rgba(16,185,129,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 900px 600px at 0% 30%, rgba(14,165,233,0.06) 0%, transparent 55%);
-    background-attachment: fixed;
   }
   ::selection {
     @apply bg-emerald-200 text-ink-900;
@@ -99,17 +94,35 @@
   }
   .glass-card {
     background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(12px) saturate(1.5);
+    -webkit-backdrop-filter: blur(12px) saturate(1.5);
     border: 1px solid rgba(255,255,255,0.5);
     box-shadow: 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9);
+    transform: translateZ(0);
   }
   .glass-dark {
     background: rgba(2,10,26,0.88);
-    backdrop-filter: blur(20px) saturate(1.5);
-    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    backdrop-filter: blur(12px) saturate(1.5);
+    -webkit-backdrop-filter: blur(12px) saturate(1.5);
     border: 1px solid rgba(255,255,255,0.06);
     box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+    transform: translateZ(0);
+  }
+
+  @keyframes shiny {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .animate-shiny {
+    animation: shiny 6s linear infinite;
+  }
+
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    position: relative;
+    transform: translateZ(0);
   }
 
   /* ── Form elements ────────────────────────────────────────────────── */
@@ -218,6 +231,7 @@
   .animate-float-delay  { animation: float 6s ease-in-out 2s infinite; }
   .animate-slide-up     { animation: slideUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
   .animate-fade-in      { animation: fadeIn 0.8s ease both; }
+  .animate-page-enter   { animation: pageEnter 400ms cubic-bezier(0.16, 1, 0.3, 1) both; will-change: transform, opacity; contain: layout style paint; }
   .animate-fade-up      { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
   .animate-shimmer      { animation: shimmer 1.8s ease-in-out infinite; }
   .animate-blink        { animation: blink 1.4s step-end infinite; }
@@ -235,6 +249,10 @@
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pageEnter {
+    from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.995); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
   }
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -261,5 +279,47 @@
     0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
-  .animate-ticker { animation: ticker 30s linear infinite; }
+  .animate-ticker {
+    animation: ticker 35s linear infinite;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .theme-circle-ripple {
+    position: fixed;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, rgba(16,185,129,0.45) 0%, rgba(15,23,42,0.9) 60%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+    z-index: 9999;
+    animation: circleExpand 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .theme-circle-ripple-sun {
+    background: radial-gradient(circle, rgba(251,191,36,0.6) 0%, rgba(253,230,138,0.85) 50%, rgba(248,250,252,0) 100%);
+  }
+
+  @media (max-width: 640px) {
+    .theme-circle-ripple {
+      width: 260px;
+      height: 260px;
+    }
+  }
+
+  @keyframes circleExpand {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0.95;
+    }
+    65% {
+      opacity: 0.75;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(7);
+      opacity: 0;
+    }
+  }
 }

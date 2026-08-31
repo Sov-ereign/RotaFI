@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ExternalLink, Cpu, Zap, ShieldCheck, Coins, Activity } from 'lucide-react';
+import { ExternalLink, Cpu } from 'lucide-react';
 
 const ITEMS = [
   '⚡ Stellar Testnet · Network Live',
@@ -23,7 +23,10 @@ export function NetworkTicker() {
   const marqueeItems = [...ITEMS, ...ITEMS]; // duplicate for seamless loop
 
   return (
-    <div className="relative overflow-hidden border-b border-slate-200/80 bg-slate-950 text-slate-300 text-[11px] shadow-sm">
+    <div
+      className="relative overflow-hidden border-b border-slate-800/80 bg-slate-950 text-slate-300 text-[11px]"
+      style={{ transform: 'translateZ(0)', contain: 'paint layout' }}
+    >
       {/* Left fade */}
       <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-slate-950 to-transparent" />
       {/* Right fade */}
@@ -32,10 +35,7 @@ export function NetworkTicker() {
       {/* Fixed Left Panel */}
       <div className="absolute left-0 top-0 z-20 flex h-full items-center gap-4 bg-slate-950 pl-4 pr-6 border-r border-slate-800/80">
         <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
           <span className="font-bold text-white text-[11px] uppercase tracking-wider">Stellar Testnet</span>
         </div>
         <div className="hidden sm:flex items-center gap-1.5 font-mono text-[10px] text-slate-400">
@@ -44,7 +44,7 @@ export function NetworkTicker() {
         </div>
       </div>
 
-      {/* Scrolling Marquee */}
+      {/* Hardware-Accelerated Scrolling Marquee */}
       <div className="flex pl-56 py-2">
         <div className="flex animate-ticker whitespace-nowrap gap-8">
           {marqueeItems.map((item, i) => (

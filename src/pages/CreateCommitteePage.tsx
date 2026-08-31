@@ -12,7 +12,7 @@ const PRESET_MEMBERS = [5, 10, 12, 20];
 const PRESET_CYCLES = [30, 60, 90];
 
 export function CreateCommitteePage() {
-  const { identity, navigate, toast } = useApp();
+  const { identity, navigate, toast, theme } = useApp();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -28,8 +28,8 @@ export function CreateCommitteePage() {
   if (!identity) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <h2 className="font-display text-2xl font-bold text-ink-900">Connect your wallet</h2>
-        <p className="mt-2 text-ink-600">Create a wallet identity to start a committee.</p>
+        <h2 className={`font-display text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-ink-900'}`}>Connect your wallet</h2>
+        <p className={`mt-2 text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-ink-600'}`}>Create a wallet identity to start a committee.</p>
       </div>
     );
   }
@@ -70,49 +70,104 @@ export function CreateCommitteePage() {
   const totalPot = amount * memberCount;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-10 space-y-6">
-      <button onClick={() => navigate({ name: 'dashboard' })} className="btn-ghost btn-sm">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-10 space-y-6 animate-page-enter">
+      <button
+        onClick={() => navigate({ name: 'dashboard' })}
+        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition ${
+          theme === 'dark'
+            ? 'bg-slate-900/80 text-slate-300 border border-white/10 hover:text-white hover:bg-white/10'
+            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+        }`}
+      >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </button>
 
       <div>
-        <h1 className="font-display text-3xl font-extrabold text-ink-900 tracking-tight">Create a ROSCA Committee</h1>
-        <p className="mt-1 text-sm text-ink-500">Configure a transparent rotating savings group enforced by Soroban smart contract logic.</p>
+        <h1 className={`font-display text-3xl font-black tracking-tight ${
+          theme === 'dark' ? 'text-white' : 'text-slate-900'
+        }`}>Create a ROSCA Committee</h1>
+        <p className={`mt-1 text-sm ${
+          theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+        }`}>Configure a transparent rotating savings group enforced by Soroban smart contract logic.</p>
       </div>
 
       {/* Stepper */}
-      <div className="flex items-center gap-2 rounded-2xl bg-white p-4 ring-1 ring-ink-200/80 shadow-soft">
+      <div className={`flex items-center gap-2 rounded-2xl p-4 shadow-md border backdrop-blur-xl ${
+        theme === 'dark'
+          ? 'liquid-glass bg-slate-900/80 border-white/10 text-white'
+          : 'bg-white border-slate-200/80 text-slate-900 ring-1 ring-slate-200/80'
+      }`}>
         {steps.map((s, i) => (
           <div key={s} className="flex flex-1 items-center gap-2">
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition ${
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black transition ${
                 i < step
-                  ? 'bg-brand-600 text-white shadow-soft'
+                  ? 'bg-emerald-500 text-black shadow-md'
                   : i === step
-                    ? 'bg-ink-900 text-white ring-4 ring-ink-900/10'
-                    : 'bg-ink-100 text-ink-400'
+                    ? theme === 'dark' ? 'bg-white text-black ring-4 ring-white/20' : 'bg-slate-900 text-white ring-4 ring-slate-900/10'
+                    : theme === 'dark' ? 'bg-slate-800 text-slate-500' : 'bg-slate-100 text-slate-400'
               }`}
             >
-              {i < step ? <Check className="h-4 w-4" /> : i + 1}
+              {i < step ? <Check className="h-4 w-4 stroke-[3]" /> : i + 1}
             </div>
-            <span className={`hidden text-xs font-semibold sm:block ${i === step ? 'text-ink-900 font-bold' : 'text-ink-400'}`}>{s}</span>
-            {i < steps.length - 1 && <div className={`h-0.5 flex-1 rounded ${i < step ? 'bg-brand-500' : 'bg-ink-200'}`} />}
+            <span className={`hidden text-xs font-semibold sm:block ${
+              i === step
+                ? theme === 'dark' ? 'text-white font-black' : 'text-slate-900 font-bold'
+                : theme === 'dark' ? 'text-slate-500' : 'text-slate-400'
+            }`}>{s}</span>
+            {i < steps.length - 1 && (
+              <div className={`h-0.5 flex-1 rounded ${
+                i < step
+                  ? 'bg-emerald-500'
+                  : theme === 'dark' ? 'bg-slate-800' : 'bg-slate-200'
+              }`} />
+            )}
           </div>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <div className="card p-6 border border-ink-200/80 shadow-soft">
+        <div className={`rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all ${
+          theme === 'dark'
+            ? 'liquid-glass bg-slate-900/80 border-white/10 text-white backdrop-blur-2xl'
+            : 'bg-white border-slate-200/80 text-slate-900 shadow-soft'
+        }`}>
         {step === 0 && (
           <div className="animate-fade-in space-y-5">
             <div>
-              <label className="label">Committee name</label>
-              <input className="input" placeholder="e.g. Family Circle, Office Committee" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} autoFocus />
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}>Committee name</label>
+              <input
+                type="text"
+                placeholder="e.g. Family Circle, Office Committee"
+                value={name}
+                maxLength={60}
+                onChange={(e) => setName(e.target.value)}
+                autoFocus
+                className={`w-full rounded-xl px-4 py-2.5 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition ${
+                  theme === 'dark'
+                    ? 'bg-slate-950/80 text-white border-white/10 placeholder-slate-500'
+                    : 'bg-white text-slate-900 border-slate-200 placeholder-slate-400'
+                }`}
+              />
             </div>
             <div>
-              <label className="label">Description <span className="font-normal text-ink-400">(optional)</span></label>
-              <textarea className="input min-h-[88px] resize-none" placeholder="What is this committee for? Who is it for?" value={description} maxLength={240} onChange={(e) => setDescription(e.target.value)} />
-              <p className="mt-1 text-right text-[11px] text-ink-400">{description.length}/240</p>
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}>Description <span className="font-normal text-slate-400">(optional)</span></label>
+              <textarea
+                placeholder="What is this committee for? Who is it for?"
+                value={description}
+                maxLength={240}
+                onChange={(e) => setDescription(e.target.value)}
+                className={`w-full min-h-[96px] resize-none rounded-xl px-4 py-2.5 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition ${
+                  theme === 'dark'
+                    ? 'bg-slate-950/80 text-white border-white/10 placeholder-slate-500'
+                    : 'bg-white text-slate-900 border-slate-200 placeholder-slate-400'
+                }`}
+              />
+              <p className="mt-1 text-right text-[11px] text-slate-400">{description.length}/240</p>
             </div>
           </div>
         )}
@@ -120,45 +175,86 @@ export function CreateCommitteePage() {
         {step === 1 && (
           <div className="animate-fade-in space-y-6">
             <div>
-              <label className="label flex items-center gap-1.5"><Coins className="h-4 w-4 text-brand-500" /> Contribution per cycle (XLM)</label>
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}><Coins className="h-4 w-4 text-emerald-400" /> Contribution per cycle (XLM)</label>
               <div className="flex flex-wrap gap-2">
                 {PRESET_AMOUNTS.map((a) => (
-                  <PresetChip key={a} active={amount === a} onClick={() => setAmount(a)}>{a} XLM</PresetChip>
+                  <PresetChip key={a} active={amount === a} onClick={() => setAmount(a)} theme={theme}>{a} XLM</PresetChip>
                 ))}
               </div>
-              <div className="mt-2 flex items-center gap-2">
-                <input type="number" min={1} className="input" value={amount} onChange={(e) => setAmount(Math.max(1, Number(e.target.value)))} />
-                <span className="text-xs text-ink-400">/cycle</span>
+              <div className="mt-2.5 flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={amount}
+                  onChange={(e) => setAmount(Math.max(1, Number(e.target.value)))}
+                  className={`w-full rounded-xl px-4 py-2 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition ${
+                    theme === 'dark'
+                      ? 'bg-slate-950/80 text-white border-white/10'
+                      : 'bg-white text-slate-900 border-slate-200'
+                  }`}
+                />
+                <span className={`text-xs ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>/cycle</span>
               </div>
             </div>
 
             <div>
-              <label className="label flex items-center gap-1.5"><Users className="h-4 w-4 text-sapphire-500" /> Number of members</label>
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}><Users className="h-4 w-4 text-sky-400" /> Number of members</label>
               <div className="flex flex-wrap gap-2">
                 {PRESET_MEMBERS.map((m) => (
-                  <PresetChip key={m} active={memberCount === m} onClick={() => setMemberCount(m)}>{m}</PresetChip>
+                  <PresetChip key={m} active={memberCount === m} onClick={() => setMemberCount(m)} theme={theme}>{m}</PresetChip>
                 ))}
               </div>
-              <input type="number" min={2} max={50} className="input mt-2" value={memberCount} onChange={(e) => setMemberCount(Math.max(2, Math.min(50, Number(e.target.value))))} />
-              <p className="mt-1 text-[11px] text-ink-400">Each member receives the pot exactly once — so there are {memberCount} cycles.</p>
+              <input
+                type="number"
+                min={2}
+                max={50}
+                value={memberCount}
+                onChange={(e) => setMemberCount(Math.max(2, Math.min(50, Number(e.target.value))))}
+                className={`w-full rounded-xl px-4 py-2 mt-2.5 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition ${
+                  theme === 'dark'
+                    ? 'bg-slate-950/80 text-white border-white/10'
+                    : 'bg-white text-slate-900 border-slate-200'
+                }`}
+              />
+              <p className={`mt-1 text-[11px] ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Each member receives the pot exactly once — so there are {memberCount} cycles.</p>
             </div>
 
             <div>
-              <label className="label flex items-center gap-1.5"><CalendarClock className="h-4 w-4 text-saffron-500" /> Cycle length</label>
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 flex items-center gap-1.5 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}><CalendarClock className="h-4 w-4 text-amber-400" /> Cycle length</label>
               <div className="flex flex-wrap gap-2">
                 {PRESET_CYCLES.map((d) => (
-                  <PresetChip key={d} active={cycleDays === d} onClick={() => setCycleDays(d)}>{d} days</PresetChip>
+                  <PresetChip key={d} active={cycleDays === d} onClick={() => setCycleDays(d)} theme={theme}>{d} days</PresetChip>
                 ))}
               </div>
-              <input type="number" min={1} className="input mt-2" value={cycleDays} onChange={(e) => setCycleDays(Math.max(1, Number(e.target.value)))} />
+              <input
+                type="number"
+                min={1}
+                value={cycleDays}
+                onChange={(e) => setCycleDays(Math.max(1, Number(e.target.value)))}
+                className={`w-full rounded-xl px-4 py-2 mt-2.5 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition ${
+                  theme === 'dark'
+                    ? 'bg-slate-950/80 text-white border-white/10'
+                    : 'bg-white text-slate-900 border-slate-200'
+                }`}
+              />
             </div>
 
-            <div className="rounded-xl bg-gradient-to-br from-brand-50 to-sapphire-50 p-4 ring-1 ring-brand-100">
+            <div className={`rounded-2xl p-4 border transition ${
+              theme === 'dark'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-white'
+                : 'bg-gradient-to-br from-emerald-50 to-sky-50 border-emerald-200/80'
+            }`}>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-ink-600">Pot per cycle</span>
-                <span className="font-display text-2xl font-extrabold text-ink-900">{formatXLM(potXLM)}</span>
+                <span className={`text-sm font-bold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-700'}`}>Pot per cycle</span>
+                <span className={`font-display text-2xl font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-slate-900'}`}>{formatXLM(potXLM)}</span>
               </div>
-              <p className="mt-1 text-[11px] text-ink-500">{formatXLM(amount)} × {memberCount} members</p>
+              <p className={`mt-1 text-[11px] ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>{formatXLM(amount)} × {memberCount} members</p>
             </div>
           </div>
         )}
@@ -166,7 +262,9 @@ export function CreateCommitteePage() {
         {step === 2 && (
           <div className="animate-fade-in space-y-6">
             <div>
-              <label className="label">Payout rule</label>
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}>Payout rule</label>
               <div className="grid gap-3 sm:grid-cols-2">
                 <OptionCard
                   active={payoutRule === 'turn_order'}
@@ -174,6 +272,7 @@ export function CreateCommitteePage() {
                   icon={<ListOrdered className="h-5 w-5" />}
                   title="Turn order"
                   desc="Fixed schedule — each member gets the pot in a set order. Simplest and most common."
+                  theme={theme}
                 />
                 <OptionCard
                   active={payoutRule === 'bidding'}
@@ -182,13 +281,16 @@ export function CreateCommitteePage() {
                   title="Bidding (v2)"
                   desc="Members bid to receive the pot earlier at a discount. Lowest bid wins."
                   disabled
+                  theme={theme}
                 />
               </div>
             </div>
 
             <div>
-              <label className="label flex items-center gap-1.5"><ShieldAlert className="h-4 w-4 text-danger-500" /> Default handling</label>
-              <p className="mb-3 text-xs text-ink-500">What happens when a member misses a contribution? This is set at creation and applied by the contract.</p>
+              <label className={`block text-xs font-extrabold uppercase tracking-wider mb-1 flex items-center gap-1.5 ${
+                theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+              }`}><ShieldAlert className="h-4 w-4 text-red-400" /> Default handling</label>
+              <p className={`mb-3 text-xs ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>What happens when a member misses a contribution? Enforced by Soroban logic.</p>
               <div className="grid gap-3">
                 <OptionCard
                   active={penaltyStrategy === 'delay'}
@@ -196,6 +298,7 @@ export function CreateCommitteePage() {
                   icon={<CalendarClock className="h-5 w-5" />}
                   title="Delay cycle"
                   desc="The cycle is held until the member pays or is excused by the organizer."
+                  theme={theme}
                 />
                 <OptionCard
                   active={penaltyStrategy === 'penalty'}
@@ -203,6 +306,7 @@ export function CreateCommitteePage() {
                   icon={<ShieldAlert className="h-5 w-5" />}
                   title="Penalty fee"
                   desc="The defaulted contribution is marked and a penalty is recorded against the member."
+                  theme={theme}
                 />
                 <OptionCard
                   active={penaltyStrategy === 'backup_fund'}
@@ -210,14 +314,27 @@ export function CreateCommitteePage() {
                   icon={<Coins className="h-5 w-5" />}
                   title="Backup fund"
                   desc="The cycle can still advance; shortfall covered by a backup fund or later make-up."
+                  theme={theme}
                 />
               </div>
             </div>
 
             {penaltyStrategy === 'penalty' && (
               <div>
-                <label className="label">Penalty amount (XLM)</label>
-                <input type="number" min={0} className="input" value={penaltyAmount} onChange={(e) => setPenaltyAmount(Math.max(0, Number(e.target.value)))} />
+                <label className={`block text-xs font-extrabold uppercase tracking-wider mb-2 ${
+                  theme === 'dark' ? 'text-slate-300' : 'text-slate-700'
+                }`}>Penalty amount (XLM)</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={penaltyAmount}
+                  onChange={(e) => setPenaltyAmount(Math.max(0, Number(e.target.value)))}
+                  className={`w-full rounded-xl px-4 py-2 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition ${
+                    theme === 'dark'
+                      ? 'bg-slate-950/80 text-white border-white/10'
+                      : 'bg-white text-slate-900 border-slate-200'
+                  }`}
+                />
               </div>
             )}
           </div>
@@ -225,42 +342,72 @@ export function CreateCommitteePage() {
 
         {step === 3 && (
           <div className="animate-fade-in space-y-4">
-            <div className="rounded-xl bg-sapphire-50 p-4 ring-1 ring-sapphire-100">
-              <div className="flex items-center gap-2 text-sm font-semibold text-sapphire-800">
-                <Info className="h-4 w-4" /> Review & deploy
+            <div className={`rounded-xl p-4 border ${
+              theme === 'dark'
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-white'
+                : 'bg-sky-50 border-sky-200/80 text-slate-900'
+            }`}>
+              <div className={`flex items-center gap-2 text-sm font-bold ${
+                theme === 'dark' ? 'text-emerald-300' : 'text-sky-900'
+              }`}>
+                <Info className="h-4 w-4 text-emerald-400" /> Review & deploy
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-sapphire-800/80">
+              <p className={`mt-1.5 text-xs leading-relaxed ${
+                theme === 'dark' ? 'text-slate-300' : 'text-sky-800'
+              }`}>
                 This will create the committee on-chain with you as organizer and member #1
                 (first payout recipient). You can invite members to join before starting the cycles.
               </p>
             </div>
-            <ReviewRow label="Name" value={name} />
-            {description && <ReviewRow label="Description" value={description} />}
-            <ReviewRow label="Contribution" value={`${formatXLM(amount)} / cycle`} />
-            <ReviewRow label="Members" value={`${memberCount} members · ${memberCount} cycles`} />
-            <ReviewRow label="Cycle length" value={`${cycleDays} days`} />
-            <ReviewRow label="Payout rule" value={payoutRule === 'turn_order' ? 'Turn order' : 'Bidding (v2)'} />
-            <ReviewRow label="Default handling" value={penaltyStrategy.replace('_', ' ')} />
-            {penaltyStrategy === 'penalty' && <ReviewRow label="Penalty" value={formatXLM(penaltyAmount)} />}
-            <ReviewRow label="Pot per cycle" value={formatXLM(potXLM)} highlight />
-            <ReviewRow label="Organizer" value={`${identity.name} (you)`} />
+            <ReviewRow label="Name" value={name} theme={theme} />
+            {description && <ReviewRow label="Description" value={description} theme={theme} />}
+            <ReviewRow label="Contribution" value={`${formatXLM(amount)} / cycle`} theme={theme} />
+            <ReviewRow label="Members" value={`${memberCount} members · ${memberCount} cycles`} theme={theme} />
+            <ReviewRow label="Cycle length" value={`${cycleDays} days`} theme={theme} />
+            <ReviewRow label="Payout rule" value={payoutRule === 'turn_order' ? 'Turn order' : 'Bidding (v2)'} theme={theme} />
+            <ReviewRow label="Default handling" value={penaltyStrategy.replace('_', ' ')} theme={theme} />
+            {penaltyStrategy === 'penalty' && <ReviewRow label="Penalty" value={formatXLM(penaltyAmount)} theme={theme} />}
+            <ReviewRow label="Pot per cycle" value={formatXLM(potXLM)} highlight theme={theme} />
+            <ReviewRow label="Organizer" value={`${identity.name} (you)`} theme={theme} />
           </div>
         )}
 
         {/* Nav buttons */}
-        <div className="mt-6 flex items-center justify-between pt-4 border-t border-ink-150">
+        <div className={`mt-8 flex items-center justify-between pt-5 border-t ${
+          theme === 'dark' ? 'border-white/10' : 'border-slate-200'
+        }`}>
           <button
-            className="btn-ghost btn-sm"
+            className={`rounded-xl px-5 py-2.5 text-xs font-bold transition flex items-center gap-1.5 ${
+              theme === 'dark'
+                ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-white/10'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
             onClick={() => (step === 0 ? navigate({ name: 'dashboard' }) : setStep((s) => s - 1))}
           >
             <ArrowLeft className="h-4 w-4" /> {step === 0 ? 'Cancel' : 'Back'}
           </button>
           {step < steps.length - 1 ? (
-            <button className="btn-primary btn-sm rounded-full shadow-soft" disabled={!canNext()} onClick={() => setStep((s) => s + 1)}>
+            <button
+              className={`rounded-xl px-6 py-2.5 text-xs font-black transition flex items-center gap-1.5 shadow-md hover:scale-105 ${
+                theme === 'dark'
+                  ? 'bg-white text-black hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]'
+                  : 'bg-slate-900 text-white hover:bg-emerald-600'
+              }`}
+              disabled={!canNext()}
+              onClick={() => setStep((s) => s + 1)}
+            >
               Continue <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
-            <button className="btn-primary btn-sm rounded-full shadow-soft" disabled={submitting} onClick={submit}>
+            <button
+              className={`rounded-xl px-6 py-2.5 text-xs font-black transition flex items-center gap-1.5 shadow-md hover:scale-105 ${
+                theme === 'dark'
+                  ? 'bg-white text-black hover:bg-white/90 shadow-[0_0_25px_rgba(255,255,255,0.25)]'
+                  : 'bg-slate-900 text-white hover:bg-emerald-600'
+              }`}
+              disabled={submitting}
+              onClick={submit}
+            >
               {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Deploying on Soroban…</> : <><Sparkles className="h-4 w-4" /> Deploy Committee Contract</>}
             </button>
           )}
@@ -269,21 +416,25 @@ export function CreateCommitteePage() {
 
       {/* Live Pot Preview Sidebar */}
       <div className="space-y-4">
-        <div className="card p-6 bg-gradient-to-br from-slate-900 via-ink-900 to-slate-950 text-white shadow-lift border border-slate-800 backdrop-blur-xl relative overflow-hidden">
-          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl" />
-          <div className="space-y-3 relative z-10">
-            <span className="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] uppercase font-bold">
+        <div className={`rounded-3xl p-6 shadow-2xl border backdrop-blur-2xl relative overflow-hidden ${
+          theme === 'dark'
+            ? 'liquid-glass bg-slate-900/90 border-white/10 text-white'
+            : 'bg-slate-950 text-white border-slate-800'
+        }`}>
+          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-emerald-500/15 blur-2xl" />
+          <div className="space-y-4 relative z-10">
+            <span className="inline-block rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-0.5 text-[10px] uppercase font-bold tracking-wider">
               Live Pot Preview
             </span>
             <div>
               <div className="text-xs text-slate-400 font-semibold">Total Pool Vault per Cycle</div>
-              <div className="font-display text-3xl font-extrabold text-white mt-0.5">
+              <div className="font-display text-3xl font-black text-white mt-0.5">
                 ₹{(totalPot * 10).toLocaleString()} INR
               </div>
               <div className="text-xs text-emerald-400 font-mono mt-0.5">({totalPot.toLocaleString()} XLM)</div>
             </div>
 
-            <div className="pt-3 border-t border-slate-800 space-y-2 text-xs">
+            <div className="pt-3 border-t border-white/10 space-y-2.5 text-xs">
               <div className="flex items-center justify-between text-slate-300">
                 <span>Members</span>
                 <span className="font-bold text-white">{memberCount}</span>
@@ -298,7 +449,7 @@ export function CreateCommitteePage() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-slate-800/80 p-3 text-[11px] text-slate-400 leading-relaxed border border-slate-700/60">
+            <div className="rounded-xl bg-slate-950/70 p-3 text-[11px] text-slate-400 leading-relaxed border border-white/10">
               <ShieldCheck className="h-4 w-4 text-emerald-400 inline mr-1" />
               Soroban smart contract automatically collects contributions and releases funds each cycle.
             </div>
@@ -310,12 +461,14 @@ export function CreateCommitteePage() {
   );
 }
 
-function PresetChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function PresetChip({ active, onClick, children, theme }: { active: boolean; onClick: () => void; children: React.ReactNode; theme: string }) {
   return (
     <button
       onClick={onClick}
-      className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
-        active ? 'bg-brand-600 text-white shadow-soft' : 'bg-ink-100 text-ink-600 hover:bg-ink-200'
+      className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
+        active
+          ? theme === 'dark' ? 'bg-white text-black font-black shadow-md' : 'bg-slate-900 text-white shadow-md'
+          : theme === 'dark' ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 border border-white/10' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
       }`}
     >
       {children}
@@ -323,33 +476,43 @@ function PresetChip({ active, onClick, children }: { active: boolean; onClick: (
   );
 }
 
-function OptionCard({ active, onClick, icon, title, desc, disabled }: { active: boolean; onClick: () => void; icon: React.ReactNode; title: string; desc: string; disabled?: boolean }) {
+function OptionCard({ active, onClick, icon, title, desc, disabled, theme }: { active: boolean; onClick: () => void; icon: React.ReactNode; title: string; desc: string; disabled?: boolean; theme: string }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
+      className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
         active
-          ? 'border-brand-500 bg-brand-50/50 ring-2 ring-brand-200'
-          : 'border-ink-200 bg-white hover:border-ink-300 hover:bg-ink-50/50'
-      } ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
+          ? theme === 'dark' ? 'border-emerald-500/50 bg-emerald-500/15 text-white ring-2 ring-emerald-500/30' : 'border-emerald-500 bg-emerald-50/50 ring-2 ring-emerald-200'
+          : theme === 'dark' ? 'border-white/10 bg-slate-950/60 text-slate-300 hover:bg-white/5' : 'border-slate-200 bg-white hover:border-slate-300'
+      } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
     >
-      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${active ? 'bg-brand-600 text-white' : 'bg-ink-100 text-ink-500'}`}>
+      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
+        active
+          ? theme === 'dark' ? 'bg-emerald-500 text-black font-extrabold' : 'bg-slate-900 text-white'
+          : theme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'
+      }`}>
         {icon}
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-bold text-ink-900">{title}</span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-ink-500">{desc}</span>
+        <span className={`block text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{title}</span>
+        <span className={`mt-0.5 block text-xs leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>{desc}</span>
       </span>
     </button>
   );
 }
 
-function ReviewRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function ReviewRow({ label, value, highlight, theme }: { label: string; value: string; highlight?: boolean; theme: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-ink-100 pb-2.5 last:border-0">
-      <span className="text-sm text-ink-500">{label}</span>
-      <span className={`text-sm font-semibold text-right ${highlight ? 'font-display text-base font-extrabold text-brand-700' : 'text-ink-900'}`}>{value}</span>
+    <div className={`flex items-center justify-between gap-4 border-b pb-2.5 last:border-0 ${
+      theme === 'dark' ? 'border-white/10' : 'border-slate-100'
+    }`}>
+      <span className={`text-xs font-semibold ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>{label}</span>
+      <span className={`text-sm font-semibold text-right ${
+        highlight
+          ? theme === 'dark' ? 'font-display text-base font-black text-emerald-400' : 'font-display text-base font-black text-emerald-600'
+          : theme === 'dark' ? 'text-white' : 'text-slate-900'
+      }`}>{value}</span>
     </div>
   );
 }

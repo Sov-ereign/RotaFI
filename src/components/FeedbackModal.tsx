@@ -43,7 +43,7 @@ export function FeedbackModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Submit Platform Feedback">
+    <Modal open={isOpen} onClose={onClose} title="Submit Platform Feedback">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="label text-xs">Rating</label>

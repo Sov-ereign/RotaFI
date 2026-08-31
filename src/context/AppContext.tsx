@@ -12,6 +12,8 @@ export type Route =
   | { name: 'profile' }
   | { name: 'feedback' };
 
+export type ThemeMode = 'dark' | 'light';
+
 interface ToastMessage {
   id: number;
   kind: 'success' | 'error' | 'info';
@@ -24,6 +26,9 @@ interface AppContextValue {
   ready: boolean;
   freighterInstalled: boolean;
   freighterChecking: boolean;
+  // theme
+  theme: ThemeMode;
+  toggleTheme: (e?: React.MouseEvent) => void;
   // auth
   register: (name: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
@@ -99,6 +104,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [freighterChecking, setFreighterChecking] = useState(true);
   const [route, setRoute] = useState<Route>(() => parseHash());
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  // ── Theme State ─────────────────────────────────────────────────────────────
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('rotafi_theme');
+    return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+  });
+
+  const toggleTheme = useCallback((e?: React.MouseEvent) => {
+    // Trigger circular ripple overlay animation if clicked
+    const x = e?.clientX ?? window.innerWidth / 2;
+    const y = e?.clientY ?? window.innerHeight / 2;
+
+    const isNextSun = theme === 'dark';
+    const circle = document.createElement('div');
+    circle.className = `theme-circle-ripple ${isNextSun ? 'theme-circle-ripple-sun' : ''}`;
+    circle.style.left = `${x}px`;
+    circle.style.top = `${y}px`;
+    document.body.appendChild(circle);
+
+    setTimeout(() => {
+      setTheme(prev => {
+        const next = prev === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('rotafi_theme', next);
+        return next;
+      });
+    }, 120);
+
+    setTimeout(() => {
+      circle.remove();
+    }, 650);
+  }, [theme]);
 
   // On mount: restore session from stored JWT + check Freighter
   useEffect(() => {
@@ -193,10 +229,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AppContextValue>(
     () => ({
       identity, ready, freighterInstalled, freighterChecking,
+      theme, toggleTheme,
       register, login, logout, linkWallet, unlinkWallet, updateProfile,
       route, navigate, toasts, toast, dismissToast,
     }),
     [identity, ready, freighterInstalled, freighterChecking,
+     theme, toggleTheme,
      register, login, logout, linkWallet, unlinkWallet, updateProfile,
      route, navigate, toasts, toast, dismissToast],
   );
