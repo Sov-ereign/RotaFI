@@ -148,9 +148,23 @@ bash contracts/deploy.sh
 
 ## 📸 Product Screenshots
 
-| Landing & Explore View | Profile, Credit Score & Reviews | Mobile Responsiveness | Vercel Analytics Dashboard |
-|---|---|---|---|
-| ![Landing Page](./public/landing_page.png) | ![Profile & Credit Score](./public/profile.png) | ![Mobile View](./public/mobile_responsiveness_ss.png) | ![Vercel Analytics](./public/vercel_analytics.png) |
+### 1. 🌐 Landing Page & Live Committee Explorer
+![Landing Page & Live Committees](./public/landing_page.png)
+
+---
+
+### 2. 👤 Account Profile, Credit Trust Gauge & Reviews
+![Profile Page, Credit Trust Score & Feedback](./public/profile.png)
+
+---
+
+### 3. 📱 Mobile Responsive Interface & Design
+![Mobile Responsiveness](./public/mobile_responsiveness_ss.png)
+
+---
+
+### 4. 📊 Vercel Telemetry & Production Analytics
+![Vercel Analytics Dashboard](./public/vercel_analytics.png)
 
 ---
 
