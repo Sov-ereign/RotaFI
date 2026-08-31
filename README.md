@@ -184,15 +184,18 @@ bash contracts/deploy.sh
 
 ## 🚀 Level 5 User Growth & Feedback-Driven Evolution
 
-### 🔔 August 28, 2026 Level 5 Re-submission Revisions Summary
+### 🔔 August 2026 Level 5 Re-submission Revisions Summary
 
-In response to the Level 5 review feedback, we implemented 2 major updates directly on GitHub:
+In response to reviewer feedback, we implemented 3 major updates directly on GitHub:
 
 1. 🦀 **Soroban Smart Contract August 2026 Upgrades**: Added `deposit_collateral_shield`, `get_collateral_shield`, and `get_yield_boost_rate` Rust functions to [`contracts/rotafi/src/lib.rs`](./contracts/rotafi/src/lib.rs). WASM re-compiled & deployed on **August 28, 2026**.  
-   👉 **Commit ID**: [`fbf9317`](https://github.com/Sov-ereign/RotaFI/commit/fbf9317)
+   👉 **Smart Contract Commit ID**: [`fbf9317`](https://github.com/Sov-ereign/RotaFI/commit/fbf9317)
 
-2. 📊 **August 2026 Active User Growth & Onboarding Dataset**: Updated all 50 testnet user onboarding records, wallet activity, and feedback reviews in [`public/rotafi_50_testers_feedback.csv`](./public/rotafi_50_testers_feedback.csv) spanning **August 1 – August 28, 2026**.  
-   👉 **Commit ID**: [`40e63f1`](https://github.com/Sov-ereign/RotaFI/commit/40e63f1)
+2. 🎨 **Complete UI/UX & Glassmorphism Redesign**: Overhauled landing hero with dot-grid pattern, animated live ticker, dark problem cards, glassmorphism navigation bar, and interactive SVG credit score gauge meter on profile page.  
+   👉 **UI Overhaul Commit IDs**: [`90d4398`](https://github.com/Sov-ereign/RotaFI/commit/90d4398) · [`0798e75`](https://github.com/Sov-ereign/RotaFI/commit/0798e75)
+
+3. 📊 **August 2026 Active User Growth & Onboarding Dataset**: Updated all 50 testnet user onboarding records, wallet activity, and feedback reviews in [`public/rotafi_50_testers_feedback.csv`](./public/rotafi_50_testers_feedback.csv) spanning **August 1 – August 28, 2026**.  
+   👉 **Dataset Commit ID**: [`40e63f1`](https://github.com/Sov-ereign/RotaFI/commit/40e63f1)
 
 ---
 
