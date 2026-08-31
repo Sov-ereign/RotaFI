@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ArrowLeft, ArrowRight, Check, Coins, Users, CalendarClock, ShieldAlert,
-  Sparkles, Loader2, ListOrdered, Gavel, Info,
+  Sparkles, Loader2, ListOrdered, Gavel, Info, ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { createCommittee, formatXLM } from '../lib/contract';
