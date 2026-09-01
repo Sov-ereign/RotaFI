@@ -57,7 +57,7 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://stellar.expert/explorer/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D"
+                    href="https://stellar.expert/explorer/testnet/contract/CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 hover:text-emerald-600 transition"
@@ -184,7 +184,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://stellar.expert/explorer/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D"
+                  href="https://stellar.expert/explorer/testnet/contract/CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 hover:text-emerald-400 hover:translate-x-1 transition-all"

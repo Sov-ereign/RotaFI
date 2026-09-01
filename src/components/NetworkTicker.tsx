@@ -3,7 +3,7 @@ import { ExternalLink, Cpu } from 'lucide-react';
 
 const ITEMS = [
   '⚡ Stellar Testnet · Network Live',
-  '🔒 Soroban Contract Verified: CATIMLHB…N4D',
+  '🔒 Soroban Contract Verified: CBIKKQ…GU2W',
   '💰 Total ROSCA Vault TVL: ₹1,25,000 INR',
   '👥 Active Members: 50+ Onboarded',
   '🏦 Yield APY: +4.8% on idle committee funds',

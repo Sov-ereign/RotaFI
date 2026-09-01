@@ -30,10 +30,10 @@ Informal chit funds run on paper, messaging apps, and blind trust. Unlicensed or
 * **Level 5 Pitch Deck Presentation**: [View 10-Slide Pitch Deck](https://rota-fi-omega.vercel.app/pitch_deck.html)
 * **Demo Video Walkthrough**: [Watch Aura Dark Theme Showcase on YouTube](https://youtu.be/iiPm1L0EC-U)
 * **Backend API Server**: [https://rotafi-hw2t.onrender.com/api](https://rotafi-hw2t.onrender.com/api)
-* **Stellar Testnet Contract ID**: [`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`](https://lab.stellar.org/r/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
+* **Stellar Testnet Contract ID**: [`CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W`](https://lab.stellar.org/r/testnet/contract/CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W)
 * **Automated CI/CD Pipeline**: [GitHub Actions Workflow](./.github/workflows/ci.yml)
 * **Brand Asset Kit & Guidelines**: [View BRANDING.md](./BRANDING.md)
-* **Stellar Expert Explorer**: [View Contract on Explorer](https://stellar.expert/explorer/testnet/contract/CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D)
+* **Stellar Expert Explorer**: [View Contract on Explorer](https://stellar.expert/explorer/testnet/contract/CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W)
 
 ---
 
@@ -60,7 +60,7 @@ RotaFi consists of a React client (Vercel) and an Express backend API (Render).
 | Variable | Value | Purpose |
 |---|---|---|
 | `VITE_STELLAR_NETWORK` | `TESTNET` | Targets Stellar Testnet network |
-| `VITE_CONTRACT_ID` | `CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D` | Deployed Soroban contract address |
+| `VITE_CONTRACT_ID` | `CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W` | Deployed Soroban contract address |
 | `VITE_API_URL` | `https://rotafi-hw2t.onrender.com/api` | Live backend REST API URL |
 
 ### 2. Backend Environment Variables (Render Settings)
@@ -219,7 +219,7 @@ bash contracts/deploy.sh
 - [x] **Public GitHub Repository**: Source code publicly available.
 - [x] **README Documentation**: Full setup, architecture, and screenshots documented.
 - [x] **15+ Meaningful Commits**: Detailed git commit trajectory on `main`.
-- [x] **Smart Contract Deployed**: Contract live on Stellar Testnet (`CATIMLHBVQAUAUINOHMSMMOOYDZWORGXZP2QDVGMKLJFTDI6IORE2N4D`).
+- [x] **Smart Contract Deployed**: Contract live on Stellar Testnet (`CBIKKQYRDC5YC2NBERZC3F5M732G7ZDPH6IAAVVTY2QYM56PZ2A4GU2W`).
 - [x] **Live Demo Deployments**: Frontend live on Vercel, API backend live on Render.
 - [x] **Monitoring & Analytics**: Sentry SDK & `@vercel/analytics` integrated directly into React layout.
 - [x] **Proof of 10+ User Wallet Interactions**: 10 Indian tester profiles created with linked Stellar Testnet Keypairs, UPI deposits, committee contributions, and bidding auction interactions.
